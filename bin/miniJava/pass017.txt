@@ -1,0 +1,49 @@
+class Foo{
+	
+	public Bar nonStaticBar;
+	public Foo nonStaticFoo;
+	
+	public static Bar staticBar;
+	public static Foo staticFoo;
+	
+	
+	public static int staticDriver() {
+		int a = staticBar.staticMethod();
+		int b = staticFoo.staticDriver();
+		return a + b;
+	}
+	
+	public int nonStaticDriver() {
+		int a = staticBar.staticMethod();
+		int b = staticFoo.staticDriver();
+		
+		int c = nonStaticBar.staticMethod();
+		int d = nonStaticFoo.staticDriver();
+		
+		return a + b + c + d;
+	}
+	
+	
+	
+}
+
+
+class Bar{
+	
+	public Bar nonStaticBar;
+	public Foo nonStaticFoo;
+	
+	public static Bar staticBar;
+	public static Foo staticFoo;
+	
+	public static int staticMethod() {
+		return staticFoo.staticDriver();
+	}
+	
+	public int method() {
+		return staticBar.method();
+	}
+	
+}
+
+

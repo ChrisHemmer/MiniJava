@@ -1,0 +1,13 @@
+class id {
+	
+	public int foo(int test) {
+		int[] array = new int[5];
+		boolean hello = (5 + 4 >= 3 * 8 ) && true || (5-foo(array[foo(2)]) == 4) || !(array[1] + array[2] >= - 10);
+		return array[0];
+	}
+	
+}
+
+class id{
+
+}

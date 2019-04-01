@@ -1,0 +1,52 @@
+class Foo{
+	
+	Foo x;
+	int y;
+	
+	
+	public int test() {
+		int x = 5;
+		return x;
+	}
+	
+	public Foo test2() {
+		Foo y = new Foo();
+		return y;
+	}
+	
+	public int test3() {
+		while (true) {
+			int x = 5;
+			return x;
+		}
+	}
+	
+	public int test4() {
+		if (true) {
+			int x = 5;
+			return x;
+		} else {
+			int x = 5;
+			return x;
+		}
+	}
+	
+	public Foo test5() {
+		while (true) {
+			Foo y = new Foo();
+			return y;
+		}
+	}
+	
+	public Foo test6() {
+		if (true) {
+			Foo y = new Foo();
+			return y;
+		} else {
+			Foo y = new Foo();
+			return y;
+		}
+	}
+
+	
+}

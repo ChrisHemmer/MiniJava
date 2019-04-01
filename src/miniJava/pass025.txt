@@ -1,0 +1,46 @@
+class Temp{}
+
+
+class Foo{
+	public Bar bar;
+	public Foo foo;
+	
+	public boolean alpha() {
+		return true;
+	}
+	
+	public int tester() {
+		return bar.hello.there.alpha();
+	}
+	
+	public boolean tester2() {
+		return bar.b.bar.b.bar.b.alpha();
+	}
+	
+	public int tester3() {
+		return foo.foo.foo.foo.foo.tester();
+	}
+}
+
+class Bar{
+	public Hello hello;
+	public Foo b;
+	
+	public There alpha() {
+		return new There();
+	}
+}
+
+class Hello{
+	public There there;
+	public Bar alpha() {
+		return new Bar();
+	}
+}
+
+class There{
+	
+	public int alpha() {
+		return 0;
+	}
+}
