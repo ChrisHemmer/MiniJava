@@ -63,6 +63,15 @@ public class ChrisCheckpoint {
 		File[] fileList = testDir.listFiles();
 		Arrays.sort(fileList);
 		for (File x : fileList) {
+			// Uncomment to skip fail cases
+			//if (x.getName().startsWith("fail")) {
+			//	continue;
+			//}
+			
+			// Uncomment to skip pass cases
+			//if (x.getName().startsWith("pass")) {
+			//	continue;
+			//}
 			if (x.getName().endsWith(".txt")) {
 				continue;
 			}

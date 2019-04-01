@@ -1,0 +1,45 @@
+class id {
+
+	public static void main(String[] args){
+		System.out.println(5);
+	}
+	public Foo foo() {
+		return new Foo();
+	}
+	
+	public Foo[] fooArray() {
+		return new Foo[5];
+	}
+	
+	public int integer() {
+		return 5;
+	}
+	
+	public int[] integerArray() {
+		return new int[5];
+	}
+	
+	public boolean bool() {
+		return false;
+	}
+	
+	public void testDriver() {
+		Foo a = foo();
+		Foo[] b = fooArray();
+		
+		int c = integer();
+		int[] d = integerArray();
+		
+		boolean e = bool();
+		return;
+	}
+	
+	
+	
+}
+
+class Foo{
+	
+	
+}
+

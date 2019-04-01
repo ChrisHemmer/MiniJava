@@ -1,0 +1,11 @@
+class Foo{
+	public int x;
+	
+	public void test() {
+		String[] a = new String[5];
+		int x = this.x;
+	}
+	
+}
+
+

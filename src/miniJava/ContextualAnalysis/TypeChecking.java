@@ -43,6 +43,7 @@ import miniJava.AbstractSyntaxTrees.VarDecl;
 import miniJava.AbstractSyntaxTrees.VarDeclStmt;
 import miniJava.AbstractSyntaxTrees.Visitor;
 import miniJava.AbstractSyntaxTrees.WhileStmt;
+import miniJava.SyntacticAnalyzer.SourcePosition;
 import miniJava.SyntacticAnalyzer.Token;
 import miniJava.SyntacticAnalyzer.TokenKind;
 
@@ -53,8 +54,11 @@ public class TypeChecking implements Visitor<Object, TypeDenoter>{
 	
 	private TypeDenoter currentReturnType;
 	
+	private boolean hasMain;
+	
 	public TypeChecking(AST ast, ErrorReporter reporter) {
 		this.reporter = reporter;
+		hasMain = false;
 		classDecls = new HashMap<String, ClassDecl>();
 		HashMap<String, Declaration> temp = new IdentificationTable(reporter).getPredefinedDecl();
 		currentReturnType = null;
@@ -167,6 +171,10 @@ public class TypeChecking implements Visitor<Object, TypeDenoter>{
 		for (ClassDecl cd: prog.classDeclList) {
 			cd.visit(this, null);
 		}
+		
+		if (!hasMain) {
+			report(prog.posn.start, "Identification", "No main method");
+		}
 		return null;
 	}
 
@@ -191,41 +199,44 @@ public class TypeChecking implements Visitor<Object, TypeDenoter>{
 
 	@Override
 	public TypeDenoter visitMethodDecl(MethodDecl md, Object arg) {
+		if (md.isStatic && !md.isPrivate && typeEquality(md.type, new BaseType(TypeKind.VOID, null))
+				&& md.name.equals("main") && md.parameterDeclList.size() == 1 && md.parameterDeclList.get(0).type instanceof ArrayType) {
+			ArrayType temp = (ArrayType) md.parameterDeclList.get(0).type;
+			if (typeEquality(temp.eltType, new ClassType(new Identifier(new Token(TokenKind.CLASS, "String", null)), null))) {
+				
+				if (hasMain) {
+					report(md.posn.start, "Identification", "More than 1 main method");
+					System.exit(4);
+				} else {
+					hasMain = true;
+				}
+			}
+		}
+		
+		
 		boolean hasReturn = false;
 		currentReturnType = md.type;
 		for (ParameterDecl pd: md.parameterDeclList) {
 			pd.visit(this, null);
 		}
-		
 		TypeDenoter returnType = null;
+		Statement returnStmt = null;
 		for (Statement st: md.statementList) {
 			st.visit(this, null);
-			/*
-			if (st instanceof ReturnStmt) {
-				if (returnType == null) {
-					//return;
-					if (!typeEquality(md.type, new BaseType(TypeKind.VOID, null))) {
-						report(st.posn.start, "Type", "Return type does not match method decl");
-					}
-				} else {
-					if (!typeEquality(returnType, md.type)) {
-						report(st.posn.start, "Type", "Return type does not match method decl");
-					}
-				}
-				hasReturn = true;
+			returnStmt = st;
+		}
+		
+		if (typeEquality(md.type, new BaseType(TypeKind.VOID, null))) {
+			if (!(returnStmt instanceof ReturnStmt)) {
+				//System.out.println(returnStmt.posn);
+				returnStmt = new ReturnStmt(null, new SourcePosition(md.posn.finish, md.posn.finish));
+				md.statementList.add(returnStmt);
 			}
-			*/
-			
-			
-			//returnType = st.visit(this, null);
-			//if (returnType != null) {
-			//	System.out.println("IN RETURN TYPE")
-			//	if (!typeEquality(returnType, md.type)) {
-			//		//System.out.println(returnType);
-			//		//reporter.reportError("*** Return type does not match method decl, line: " + md.posn.start);
-			//		report(st.posn.start, "Type", "Return type does not match method decl");
-			//	}
-			//}
+		}
+		
+		if (!(returnStmt instanceof ReturnStmt)) {
+			report(returnStmt.posn.start, "Type", "Last statement is not a return statement");
+			System.exit(4);
 		}
 		//if (!hasReturn && !typeEquality(md.type, new BaseType(TypeKind.VOID, null))) {
 		//	report(md.posn.start, "Type", "No return statement for a non-void method");
