@@ -3,6 +3,7 @@ package tester;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
@@ -48,7 +49,11 @@ public class Checkpoint3 {
 
 		System.out.println("Running tests from directory " + testDir);
         int failures = 0;
-        for (File x : testDir.listFiles()) {
+        
+        File[] fileList = testDir.listFiles();
+		Arrays.sort(fileList);
+		
+        for (File x : fileList) {
             if (x.getName().endsWith("out") || x.getName().startsWith(".") 
                 || x.getName().endsWith("mJAM") || x.getName().endsWith("asm"))
                    continue;

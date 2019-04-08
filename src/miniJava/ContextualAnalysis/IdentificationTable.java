@@ -124,8 +124,6 @@ public class IdentificationTable {
 				
 				if (decl instanceof MemberDecl) {
 					if (!((MemberDecl) decl).isStatic && onlyStaticAccess && i == 2) {
-//						report(decl.posn.start, "Identification", "Attempted access of a non-static member from a static context");
-						System.out.println("SCOPE LEVEL: " + i);
 						report(lineNumber, "Identification", "Attempted access of a non-static member from a static context1");
 						System.exit(4);
 						return null;

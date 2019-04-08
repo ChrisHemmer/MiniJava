@@ -572,12 +572,15 @@ public class Identification implements Visitor<Object, Object>{
 				errorCause = "Non existant class (" + id.spelling + ")";
 			}
 		} else {
-			
 			decl = classTable.getClassTable(context).getPublic(id.spelling);
 			
-			if (table.get(id.spelling, id.posn.start) == currentClass) {
-				System.out.println(" IN HERE IN HERE IN HERE");
+			if (decl == null && context.equals(currentClass.name)) {
+				decl = classTable.getClassTable(context).getPrivate(id.spelling);
 			}
+			
+			//if (table.get(id.spelling, id.posn.start) == currentClass) {
+			//	System.out.println(" IN HERE IN HERE IN HERE");
+			//}
 			
 			if (decl == null) {
 				if (!classTable.getClassTable(context).contains(id.spelling)) {
