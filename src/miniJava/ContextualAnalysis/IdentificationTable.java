@@ -123,9 +123,10 @@ public class IdentificationTable {
 				Declaration decl = table.get(i).get(id);
 				
 				if (decl instanceof MemberDecl) {
-					if (!((MemberDecl) decl).isStatic && onlyStaticAccess) {
+					if (!((MemberDecl) decl).isStatic && onlyStaticAccess && i == 2) {
 //						report(decl.posn.start, "Identification", "Attempted access of a non-static member from a static context");
-						report(lineNumber, "Identification", "Attempted access of a non-static member from a static context");
+						System.out.println("SCOPE LEVEL: " + i);
+						report(lineNumber, "Identification", "Attempted access of a non-static member from a static context1");
 						System.exit(4);
 						return null;
 					}
@@ -146,9 +147,9 @@ public class IdentificationTable {
 				Declaration decl = table.get(i).get(id);
 				
 				if (decl instanceof MemberDecl) {
-					if (!((MemberDecl) decl).isStatic && onlyStaticAccess) {
+					if (!((MemberDecl) decl).isStatic && onlyStaticAccess  && i == 2) {
 //						report(decl.posn.start, "Identification", "Attempted access of a non-static member from a static context");
-						report(lineNumber, "Identification", "Attempted access of a non-static member from a static context");
+						report(lineNumber, "Identification", "Attempted access of a non-static member from a static context2");
 						System.exit(4);
 						return null;
 					}
@@ -163,9 +164,9 @@ public class IdentificationTable {
 		Declaration decl = table.get(scopeLevel).get(id);
 		
 		if (decl instanceof MemberDecl) {
-			if (!((MemberDecl) decl).isStatic && onlyStaticAccess) {
+			if (!((MemberDecl) decl).isStatic && onlyStaticAccess && scopeLevel == 2) {
 //				report(decl.posn.start, "Identification", "Attempted access of a non-static member from a static context");
-				report(lineNumber, "Identification", "Attempted access of a non-static member from a static context");
+				report(lineNumber, "Identification", "Attempted access of a non-static member from a static context3");
 				System.exit(4);
 				return null;
 			}

@@ -81,6 +81,13 @@ public class ClassMemberTable {
 		}
 		return null;
 	}
+	
+	public Declaration getPublicStatic(String name) {
+		if (staticMembers.containsKey(name) && publicMembers.containsKey(name)) {
+			return staticMembers.get(name);
+		}
+		return null;
+	}
 
 	
 	public Declaration get(String name) {

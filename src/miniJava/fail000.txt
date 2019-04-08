@@ -1,4 +1,0 @@
-// invalid:  identification error in line 3
-class Baz {
-    Foo x;
-}

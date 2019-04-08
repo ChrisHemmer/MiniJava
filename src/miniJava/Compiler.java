@@ -77,6 +77,9 @@ public class Compiler {
 		}
 		// END: Checking results of parsing
 		
+		System.out.println(inputStream.toString());
+		
+		
 		System.out.println("Contextual analysis ... ");
 		
 		

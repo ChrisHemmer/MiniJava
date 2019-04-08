@@ -140,7 +140,7 @@ public class Identification implements Visitor<Object, Object>{
 		
 		//table.put(md.name, md);
 		if (md.isStatic) {
-			//inStaticMethod = true;
+			inStaticMethod = true;
 			table.onlyStatic();
 		}
 		md.type.visit(this, null);
@@ -155,7 +155,8 @@ public class Identification implements Visitor<Object, Object>{
 		table.closeScope();
 		table.closeScope();
 		//inStaticMethod = false;
-		//inStaticMethod = false;
+		
+		inStaticMethod = false;
 		table.allAccess();
 		return null;
 	}
@@ -175,7 +176,6 @@ public class Identification implements Visitor<Object, Object>{
 	public Object visitVarDecl(VarDecl decl, Object arg) {
 		////System.out.println("in vardecl");
 		table.put(decl.name, decl);
-		// Do I need this?
 		decl.type.visit(this, null);
 		
 		return null;
@@ -225,12 +225,11 @@ public class Identification implements Visitor<Object, Object>{
 		
 		stmt.varDecl.visit(this, null);
 		table.disallowAccess(stmt.varDecl.name);
+		if (stmt.initExp instanceof NewArrayExpr) {
+			System.out.println("Oh boy its a new array expression");
+		}
 		stmt.initExp.visit(this, null);
 		table.allowAccess();
-		
-		
-		
-		//stmt.initExp.visit(this, null);
 		
 		return null;
 	}
@@ -238,7 +237,12 @@ public class Identification implements Visitor<Object, Object>{
 	// HERE
 	@Override
 	public Object visitAssignStmt(AssignStmt stmt, Object arg) {
+		
+		if (stmt.val instanceof NewArrayExpr) {
+			System.out.println("Oh girl its a new array expression");
+		}
 		stmt.val.visit(this, null);
+		
 		stmt.ref.visit(this, null);
 		
 		//stmt.val.visit(this, null);
@@ -371,6 +375,7 @@ public class Identification implements Visitor<Object, Object>{
 
 	@Override
 	public Object visitNewArrayExpr(NewArrayExpr expr, Object arg) {
+		
 		expr.eltType.visit(this, null);
 		expr.sizeExpr.visit(this, null);
 		
@@ -402,8 +407,10 @@ public class Identification implements Visitor<Object, Object>{
 	@Override
 	public Object visitThisRef(ThisRef ref, Object arg) {
 		// CONTEXT: Need to find member within current class
-		// INCORRECT, NEED TO LINK TO THE MEMBER, NOT THE CLASS (maybe nevermind???)
-		//System.out.println("IN VISIT THIS REF IN ID");
+		
+		if (inStaticMethod) {
+			report(ref.posn.start, "Identification", "Cannot reference this in a static reference");
+		}
 		ref.decl = currentClass;
 		return null;
 	}
@@ -425,10 +432,8 @@ public class Identification implements Visitor<Object, Object>{
 		// If this: just check the current class' fields
 		// If id: check fields of the reference
 		// if qualRef: check the fields of the ref.ref.id.decl
-		//if ()
+		
 		Declaration decl = null;
-		//String classType = null;
-		//ClassType temp = null;
 		
 		if (ref.ref instanceof IdRef) {
 			// Call visitIdRef
@@ -441,24 +446,28 @@ public class Identification implements Visitor<Object, Object>{
 				// Non Static Reference
 				LocalDecl tempDecl = (LocalDecl) decl;
 				ClassType cType = null;
+				ArrayType aType = null;
 				try {
 					cType = (ClassType) tempDecl.type;
+					decl = (Declaration) ref.id.visit(this, cType.className.spelling);
 				} catch (ClassCastException e) {
 					report(tempDecl.posn.start, "Identification", "Attempting to dereference a non-object type");
 					System.exit(4);
 				}
-				decl = (Declaration) ref.id.visit(this, cType.className.spelling);
+//				decl = (Declaration) ref.id.visit(this, cType.className.spelling);
 			} else if (decl instanceof MemberDecl) {
 				//Non static reference
 				MemberDecl tempDecl = (MemberDecl) decl;
 				ClassType cType = null;
+				ArrayType aType = null;
 				try {
 					cType = (ClassType) tempDecl.type;
+					decl = (Declaration) ref.id.visit(this, cType.className.spelling);
 				} catch(ClassCastException e) {
 					report(tempDecl.posn.start, "Identification", "Attempting to dereference a non-object type");
 					System.exit(4);
 				}
-				decl = (Declaration) ref.id.visit(this, cType.className.spelling);
+//				decl = (Declaration) ref.id.visit(this, cType.className.spelling);
 			}
 		} else if (ref.ref instanceof ThisRef) {
 			// Call visitThisRef
@@ -471,35 +480,33 @@ public class Identification implements Visitor<Object, Object>{
 				ClassDecl tempDecl = (ClassDecl) decl;
 				// Static Reference
 				decl = (Declaration) ref.id.visit(this, "~:::" + tempDecl.name);
-				//decl = (Declaration) ref.id.visit(this, "~:::" + ((ClassType) tempDecl.type).className.spelling);
 			} else if (decl instanceof LocalDecl) {
 				// Non Static Reference
-				/*
-				LocalDecl tempDecl = (LocalDecl) decl;
-				decl = (Declaration) ref.id.visit(this, ((ClassType) tempDecl.type).className.spelling);
-				*/
 				LocalDecl tempDecl = (LocalDecl) decl;
 				ClassType cType = null;
+				ArrayType aType = null;
 				try {
 					cType = (ClassType) tempDecl.type;
+					decl = (Declaration) ref.id.visit(this, cType.className.spelling);
 				} catch (ClassCastException e) {
 					report(tempDecl.posn.start, "Identification", "Attempting to dereference a non-object type");
 					System.exit(4);
 				}
-				decl = (Declaration) ref.id.visit(this, cType.className.spelling);
+//				decl = (Declaration) ref.id.visit(this, cType.className.spelling);
 				
 			} else if (decl instanceof MemberDecl) {
 				//Non static reference
 				MemberDecl tempDecl = (MemberDecl) decl;
 				ClassType cType = null;
+				ArrayType aType = null;
 				try {
 					cType = (ClassType) tempDecl.type;
+					decl = (Declaration) ref.id.visit(this, cType.className.spelling);
 				} catch(ClassCastException e) {
 					report(tempDecl.posn.start, "Identification", "Attempting to dereference a non-object type");
-					//reporter.reportError("*** Attempting to dereference a non class type variable, line: " + ref.posn.start);
 					System.exit(4);
 				}
-				decl = (Declaration) ref.id.visit(this, cType.className.spelling);
+//				decl = (Declaration) ref.id.visit(this, cType.className.spelling);
 			} else {
 				//System.out.println("IN THIS ELSE BLOCK +++++++++++++++++++++++++++");
 				//System.out.println(decl);
@@ -539,6 +546,7 @@ public class Identification implements Visitor<Object, Object>{
 				errorCause = "Non existant class member (" + currentClass.name + "." + id.spelling + ")"; 
 			}
 		} else if (context == "idRef") {
+			System.out.println("IN ID REF: " + id.spelling);
 			//Local context
 			decl = table.get(id.spelling, id.posn.start);
 			//System.out.println("DECL: " + decl);
@@ -547,8 +555,14 @@ public class Identification implements Visitor<Object, Object>{
 			}
 		} else if (context.charAt(0) == '~'){
 			//Static context
+			String currentName = currentClass.name;
 			String className = context.substring(4);
-			decl = classTable.getClassTable(className).getStatic(id.spelling);
+			if (currentName.equals(className)) {
+				decl = classTable.getClassTable(className).getStatic(id.spelling);
+			} else {
+				decl = classTable.getClassTable(className).getPublicStatic(id.spelling);
+			}
+			
 			if (decl == null) {
 				errorCause = "Static reference of a non static member (" + id.spelling + ")";
 			}
@@ -560,6 +574,11 @@ public class Identification implements Visitor<Object, Object>{
 		} else {
 			
 			decl = classTable.getClassTable(context).getPublic(id.spelling);
+			
+			if (table.get(id.spelling, id.posn.start) == currentClass) {
+				System.out.println(" IN HERE IN HERE IN HERE");
+			}
+			
 			if (decl == null) {
 				if (!classTable.getClassTable(context).contains(id.spelling)) {
 					errorCause = "Non existant class member (" + context + "." + id.spelling + ")";
