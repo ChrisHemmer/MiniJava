@@ -257,6 +257,12 @@ public class Identification implements Visitor<Object, Object>{
 	public Object visitCallStmt(CallStmt stmt, Object arg) {
 		// calls reference.visit
 		stmt.methodRef.visit(this, null);
+		
+		if (!(stmt.methodRef.decl instanceof MethodDecl)) {
+			report(stmt.posn.start, "Identification", "Call statement reference not a method decl");
+			System.exit(4);
+		}
+		
 		for (Expression expr: stmt.argList) {
 			expr.visit(this, null);
 		}
@@ -341,6 +347,10 @@ public class Identification implements Visitor<Object, Object>{
 	@Override
 	public Object visitRefExpr(RefExpr expr, Object arg) {
 		expr.ref.visit(this, null);
+		if (expr.ref.decl instanceof MethodDecl) {
+			report(expr.posn.start, "Identification", "Reference cannot be a method");
+			System.exit(4);
+		}
 		return null;
 	}
 
@@ -351,7 +361,10 @@ public class Identification implements Visitor<Object, Object>{
 
 		// Is this enough?
 		expr.functionRef.visit(this, null);
-		
+		if (!(expr.functionRef.decl instanceof MethodDecl)) {
+			report(expr.posn.start, "Identification", "Call expression reference not a method decl");
+			System.exit(4);
+		}
 		
 		for (Expression argExpr: expr.argList) {
 			argExpr.visit(this, null);
@@ -418,6 +431,7 @@ public class Identification implements Visitor<Object, Object>{
 	@Override
 	public Object visitIdRef(IdRef ref, Object arg) {
 		// CONTEXT: Need to find closest variable declaration with this name
+		
 		Declaration temp = (Declaration) ref.id.visit(this, "idRef");
 		ref.decl = temp;
 		return temp;
@@ -434,6 +448,12 @@ public class Identification implements Visitor<Object, Object>{
 		// if qualRef: check the fields of the ref.ref.id.decl
 		
 		Declaration decl = null;
+		
+		if (ref.ref.decl instanceof MethodDecl || ref.decl instanceof MethodDecl) {
+			report(ref.posn.start, "Identification", "Reference cannot be a method");
+			System.exit(4);
+		}
+		
 		
 		if (ref.ref instanceof IdRef) {
 			// Call visitIdRef
@@ -514,6 +534,13 @@ public class Identification implements Visitor<Object, Object>{
 		}
 		ref.decl = decl;
 		
+		if (ref.ref.decl instanceof MethodDecl) {
+			report(ref.posn.start, "Identification", "Reference cannot be a method");
+			System.exit(4);
+		}
+		
+		
+		
 		return decl;
 	}
 
@@ -546,7 +573,6 @@ public class Identification implements Visitor<Object, Object>{
 				errorCause = "Non existant class member (" + currentClass.name + "." + id.spelling + ")"; 
 			}
 		} else if (context == "idRef") {
-			System.out.println("IN ID REF: " + id.spelling);
 			//Local context
 			decl = table.get(id.spelling, id.posn.start);
 			//System.out.println("DECL: " + decl);
@@ -596,6 +622,12 @@ public class Identification implements Visitor<Object, Object>{
 			//reporter.reportError("*** Error Linking Identifier: " + id.spelling + " at line numbers (" + id.posn.start +" - " + id.posn.finish + ") \n Cause: " + errorCause);
 			System.exit(4);
 		} else {
+			System.out.println("======================");
+			System.out.println("Method: " + (decl instanceof MethodDecl));
+			System.out.println("Field: " + (decl instanceof FieldDecl));
+			System.out.println("Class: " + (decl instanceof ClassDecl));
+			System.out.println("Local: " + (decl instanceof LocalDecl));
+			System.out.println("Parameter: " + (decl instanceof ParameterDecl));
 			id.decl = decl;
 		}
 		return decl;
