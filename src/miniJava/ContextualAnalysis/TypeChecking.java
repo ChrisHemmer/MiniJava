@@ -172,11 +172,11 @@ public class TypeChecking implements Visitor<Object, TypeDenoter>{
 			cd.visit(this, null);
 		}
 		
-		/*
+		
 		if (!hasMain) {
 			report(prog.posn.start, "Identification", "No main method");
 		}
-		*/
+		
 		return null;
 	}
 
@@ -206,14 +206,14 @@ public class TypeChecking implements Visitor<Object, TypeDenoter>{
 			ArrayType temp = (ArrayType) md.parameterDeclList.get(0).type;
 			if (typeEquality(temp.eltType, new ClassType(new Identifier(new Token(TokenKind.CLASS, "String", null)), null))) {
 				
-				/*
+				
 				if (hasMain) {
 					report(md.posn.start, "Identification", "More than 1 main method");
 					System.exit(4);
 				} else {
 					hasMain = true;
 				}
-				*/
+				
 			}
 		}
 		
@@ -242,6 +242,9 @@ public class TypeChecking implements Visitor<Object, TypeDenoter>{
 			report(returnStmt.posn.start, "Type", "Last statement is not a return statement");
 			System.exit(4);
 		}
+		
+		
+		
 		//if (!hasReturn && !typeEquality(md.type, new BaseType(TypeKind.VOID, null))) {
 		//	report(md.posn.start, "Type", "No return statement for a non-void method");
 		//}

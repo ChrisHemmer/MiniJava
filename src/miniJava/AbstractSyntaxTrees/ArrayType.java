@@ -20,6 +20,5 @@ public class ArrayType extends TypeDenoter {
 	    }
 
 	    public TypeDenoter eltType;
-	    public int length;
 	}
 
