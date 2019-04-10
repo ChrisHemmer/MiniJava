@@ -471,10 +471,19 @@ public class Identification implements Visitor<Object, Object>{
 					cType = (ClassType) tempDecl.type;
 					decl = (Declaration) ref.id.visit(this, cType.className.spelling);
 				} catch (ClassCastException e) {
-					report(tempDecl.posn.start, "Identification", "Attempting to dereference a non-object type");
-					System.exit(4);
+					try {
+						if (!(ref.id.spelling.equals("length"))) {
+							report(tempDecl.posn.start, "Identification", "Array type has no field (" + ref.id.spelling + ")");
+						}
+						aType = (ArrayType) tempDecl.type;
+						decl = aType.length;
+						ref.id.decl = aType.length;
+					} catch (ClassCastException f) {
+						report(tempDecl.posn.start, "Identification", "Attempting to dereference a non-object type1");
+						System.exit(4);
+					}
+					
 				}
-//				decl = (Declaration) ref.id.visit(this, cType.className.spelling);
 			} else if (decl instanceof MemberDecl) {
 				//Non static reference
 				MemberDecl tempDecl = (MemberDecl) decl;
@@ -483,11 +492,20 @@ public class Identification implements Visitor<Object, Object>{
 				try {
 					cType = (ClassType) tempDecl.type;
 					decl = (Declaration) ref.id.visit(this, cType.className.spelling);
+					
 				} catch(ClassCastException e) {
-					report(tempDecl.posn.start, "Identification", "Attempting to dereference a non-object type");
-					System.exit(4);
+					try {
+						aType = (ArrayType) tempDecl.type;
+						if (!(ref.id.spelling.equals("length"))) {
+							report(tempDecl.posn.start, "Identification", "Array type has no field (" + ref.id.spelling + ")");
+						}
+						decl = aType.length;
+						ref.id.decl = aType.length;
+					} catch (ClassCastException f) {
+						report(tempDecl.posn.start, "Identification", "Attempting to dereference a non-object type");
+						System.exit(4);
+					}
 				}
-//				decl = (Declaration) ref.id.visit(this, cType.className.spelling);
 			}
 		} else if (ref.ref instanceof ThisRef) {
 			// Call visitThisRef
@@ -509,10 +527,18 @@ public class Identification implements Visitor<Object, Object>{
 					cType = (ClassType) tempDecl.type;
 					decl = (Declaration) ref.id.visit(this, cType.className.spelling);
 				} catch (ClassCastException e) {
-					report(tempDecl.posn.start, "Identification", "Attempting to dereference a non-object type");
-					System.exit(4);
+					try {
+						aType = (ArrayType) tempDecl.type;
+						if (!(ref.id.spelling.equals("length"))) {
+							report(tempDecl.posn.start, "Identification", "Array type has no field (" + ref.id.spelling + ")");
+						}
+						decl = aType.length;
+						ref.id.decl = aType.length;
+					} catch (ClassCastException f) {
+						report(tempDecl.posn.start, "Identification", "Attempting to dereference a non-object type");
+						System.exit(4);
+					}
 				}
-//				decl = (Declaration) ref.id.visit(this, cType.className.spelling);
 				
 			} else if (decl instanceof MemberDecl) {
 				//Non static reference
@@ -523,17 +549,23 @@ public class Identification implements Visitor<Object, Object>{
 					cType = (ClassType) tempDecl.type;
 					decl = (Declaration) ref.id.visit(this, cType.className.spelling);
 				} catch(ClassCastException e) {
-					report(tempDecl.posn.start, "Identification", "Attempting to dereference a non-object type");
-					System.exit(4);
+					try {
+						aType = (ArrayType) tempDecl.type;
+						if (!(ref.id.spelling.equals("length"))) {
+							report(tempDecl.posn.start, "Identification", "Array type has no field (" + ref.id.spelling + ")");
+						}
+						decl = aType.length;
+						ref.id.decl = aType.length;
+					} catch (ClassCastException f) {
+						report(tempDecl.posn.start, "Identification", "Attempting to dereference a non-object type");
+						System.exit(4);
+					}
 				}
-//				decl = (Declaration) ref.id.visit(this, cType.className.spelling);
 			} else {
-				//System.out.println("IN THIS ELSE BLOCK +++++++++++++++++++++++++++");
-				//System.out.println(decl);
 			}
 		}
 		ref.decl = decl;
-		
+		//System.out.println(ref.id.decl);
 		if (ref.ref.decl instanceof MethodDecl) {
 			report(ref.posn.start, "Identification", "Reference cannot be a method");
 			System.exit(4);

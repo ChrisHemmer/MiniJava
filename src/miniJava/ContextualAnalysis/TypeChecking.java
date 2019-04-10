@@ -329,16 +329,18 @@ public class TypeChecking implements Visitor<Object, TypeDenoter>{
 	@Override
 	public TypeDenoter visitAssignStmt(AssignStmt stmt, Object arg) {
 		TypeDenoter refType = stmt.ref.visit(this, null);
-		//System.out.println("RefType: " + refType);
-		//if (refType == null) {
-		//	refType = new ClassType(new Identifier(new Token(TokenKind.IDENTIFIER, stmt.ref.decl.name,null)), null);
-		//}
+		
+		if (stmt.ref instanceof QualRef) {
+			QualRef temp = (QualRef)stmt.ref;
+			if (temp.ref.decl.type instanceof ArrayType) {
+				report(stmt.posn.start, "Type", "Array length cannot be set");
+			}
+		}
+		
 		TypeDenoter valType = stmt.val.visit(this, null);
-		//System.out.println("ValType: " + valType);
 		
 		
 		if (!typeEquality(refType, valType)) {
-			//reporter.reportError("*** Incompatible types in assignment at line: " + stmt.posn.start);
 			report(stmt.posn.start, "Type", "Incompatible types in assignment");
 		}
 		

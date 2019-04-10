@@ -13,6 +13,7 @@ public class ArrayType extends TypeDenoter {
 	    public ArrayType(TypeDenoter eltType, SourcePosition posn){
 	        super(TypeKind.ARRAY, posn);
 	        this.eltType = eltType;
+	        length = new FieldDecl(false, false, new BaseType(TypeKind.INT, posn), "length", posn);
 	    }
 	        
 	    public <A,R> R visit(Visitor<A,R> v, A o) {
@@ -20,5 +21,7 @@ public class ArrayType extends TypeDenoter {
 	    }
 
 	    public TypeDenoter eltType;
+	    
+	    public FieldDecl length;
 	}
 
