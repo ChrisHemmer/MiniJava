@@ -47,7 +47,6 @@ public class Identification implements Visitor<Object, Object>{
 	
 	private IdentificationTable table;
 	private ClassDeclTable classTable;
-	@SuppressWarnings("unused")
 	private ErrorReporter reporter;
 	
 	private ClassDecl currentClass;
