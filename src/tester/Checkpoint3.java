@@ -1,6 +1,9 @@
 package tester;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -20,6 +23,9 @@ public class Checkpoint3 {
 	private static String projDir;
 	private static File classPath;
 	private static File testDir;
+	
+	private static String currentError;
+	
         
     public static void main(String[] args) throws IOException, InterruptedException {
 
@@ -54,6 +60,12 @@ public class Checkpoint3 {
 		Arrays.sort(fileList);
 		
         for (File x : fileList) {
+        	
+        	if (x.getName().startsWith("pass") || x.getName().startsWith("fails.txt")) {
+        		continue;
+        	}
+        	System.out.println("===========================================================");
+        	
             if (x.getName().endsWith("out") || x.getName().startsWith(".") 
                 || x.getName().endsWith("mJAM") || x.getName().endsWith("asm"))
                    continue;
@@ -77,9 +89,14 @@ public class Checkpoint3 {
                     System.err.println(x.getName()  + " did not pass!");
                 }
             } else {
-                if (returnCode == 4)
-                    System.out.println(x.getName() + " failed successfully!");
-                else {
+                if (returnCode == 4) {
+                	if (checkLine(x) == getLine(currentError)) {
+                		System.out.println(x.getName() + " failed successfully!");
+                	} else {
+                		System.err.println(x.getName() + " failed but with wrong line number");
+                		failures ++;
+                	}
+                }else {
                     System.err.println(x.getName() + " failed to detect the error!");
                     failures++;
                 }
@@ -108,14 +125,44 @@ public class Checkpoint3 {
         
     public static void processStream(InputStream stream) {
         Scanner scan = new Scanner(stream);
+        boolean changedError = false;
         while (scan.hasNextLine()) {
             String line = scan.nextLine();
-            if (line.startsWith("*** "))
+            if (line.startsWith("*** ")) {
+            	if (!changedError) {
+            		currentError = line;
+            		changedError = true;
+            	}
                 System.out.println(line);
+            }
             if (line.startsWith("ERROR")) {
                 System.out.println(line);
             }
         }
         scan.close();
+    }
+    
+    private static int checkLine(File x) {
+    	try {
+    		BufferedReader br = new BufferedReader(new FileReader(x));
+    		String firstLine = br.readLine();
+    		String[] splitted = firstLine.split("line ");
+    		//System.out.println(splitted[0].split(":")[0]);
+    		int line = Integer.parseInt(splitted[1].split(":")[0]);
+    		//System.out.println(line);
+    		return line;
+    		//return 0;
+    	} catch (FileNotFoundException e) {
+    		return -1;
+    	} catch (IOException f) {
+    		return -1;
+    	}
+    }
+    
+    private static int getLine (String x) {
+    	String[] splitted = x.split("line ");
+		//System.out.println(splitted[0].split(":")[0]);
+		int line = Integer.parseInt(splitted[1].split(":")[0]);
+		return line;
     }
 }

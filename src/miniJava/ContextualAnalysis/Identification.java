@@ -472,14 +472,16 @@ public class Identification implements Visitor<Object, Object>{
 					decl = (Declaration) ref.id.visit(this, cType.className.spelling);
 				} catch (ClassCastException e) {
 					try {
-						if (!(ref.id.spelling.equals("length"))) {
-							report(tempDecl.posn.start, "Identification", "Array type has no field (" + ref.id.spelling + ")");
-						}
 						aType = (ArrayType) tempDecl.type;
+						if (!(ref.id.spelling.equals("length"))) {
+							report(ref.id.posn.start, "Identification", "Array type has no field (" + ref.id.spelling + ")");
+							System.exit(4);
+						}
+						
 						decl = aType.length;
 						ref.id.decl = aType.length;
 					} catch (ClassCastException f) {
-						report(tempDecl.posn.start, "Identification", "Attempting to dereference a non-object type1");
+						report(ref.id.posn.start, "Identification", "Attempting to dereference a non-object type");
 						System.exit(4);
 					}
 					
@@ -497,12 +499,13 @@ public class Identification implements Visitor<Object, Object>{
 					try {
 						aType = (ArrayType) tempDecl.type;
 						if (!(ref.id.spelling.equals("length"))) {
-							report(tempDecl.posn.start, "Identification", "Array type has no field (" + ref.id.spelling + ")");
+							report(ref.id.posn.start, "Identification", "Array type has no field (" + ref.id.spelling + ")");
+							System.exit(4);
 						}
 						decl = aType.length;
 						ref.id.decl = aType.length;
 					} catch (ClassCastException f) {
-						report(tempDecl.posn.start, "Identification", "Attempting to dereference a non-object type");
+						report(ref.id.posn.start, "Identification", "Attempting to dereference a non-object type");
 						System.exit(4);
 					}
 				}
@@ -530,12 +533,13 @@ public class Identification implements Visitor<Object, Object>{
 					try {
 						aType = (ArrayType) tempDecl.type;
 						if (!(ref.id.spelling.equals("length"))) {
-							report(tempDecl.posn.start, "Identification", "Array type has no field (" + ref.id.spelling + ")");
+							report(ref.id.posn.start, "Identification", "Array type has no field (" + ref.id.spelling + ")");
+							System.exit(4);
 						}
 						decl = aType.length;
 						ref.id.decl = aType.length;
 					} catch (ClassCastException f) {
-						report(tempDecl.posn.start, "Identification", "Attempting to dereference a non-object type");
+						report(ref.id.posn.start, "Identification", "Attempting to dereference a non-object type");
 						System.exit(4);
 					}
 				}
@@ -553,11 +557,12 @@ public class Identification implements Visitor<Object, Object>{
 						aType = (ArrayType) tempDecl.type;
 						if (!(ref.id.spelling.equals("length"))) {
 							report(tempDecl.posn.start, "Identification", "Array type has no field (" + ref.id.spelling + ")");
+							System.exit(4);
 						}
 						decl = aType.length;
 						ref.id.decl = aType.length;
 					} catch (ClassCastException f) {
-						report(tempDecl.posn.start, "Identification", "Attempting to dereference a non-object type");
+						report(ref.id.posn.start, "Identification", "Attempting to dereference a non-object type");
 						System.exit(4);
 					}
 				}
@@ -615,13 +620,23 @@ public class Identification implements Visitor<Object, Object>{
 			//Static context
 			String currentName = currentClass.name;
 			String className = context.substring(4);
+			
+			if (!classTable.getClassTable(className).contains(id.spelling)){
+				report(id.posn.start, "Identification", "Non existant class member");
+				System.exit(4);
+			}
+			
 			if (currentName.equals(className)) {
 				decl = classTable.getClassTable(className).getStatic(id.spelling);
 			} else {
 				decl = classTable.getClassTable(className).getPublicStatic(id.spelling);
 			}
 			
-			if (decl == null) {
+			if (decl == null && classTable.getClassTable(className).getPublic(id.spelling) != null) {
+				errorCause = "Cannot access static field from a non static context";
+			} else if (decl == null && classTable.getClassTable(className).contains(id.spelling)) {
+				errorCause = "Cannot access private member from another class";
+			} else if (decl == null) {
 				errorCause = "Static reference of a non static member (" + id.spelling + ")";
 			}
 		} else if (context == "class") {
@@ -654,12 +669,6 @@ public class Identification implements Visitor<Object, Object>{
 			//reporter.reportError("*** Error Linking Identifier: " + id.spelling + " at line numbers (" + id.posn.start +" - " + id.posn.finish + ") \n Cause: " + errorCause);
 			System.exit(4);
 		} else {
-			System.out.println("======================");
-			System.out.println("Method: " + (decl instanceof MethodDecl));
-			System.out.println("Field: " + (decl instanceof FieldDecl));
-			System.out.println("Class: " + (decl instanceof ClassDecl));
-			System.out.println("Local: " + (decl instanceof LocalDecl));
-			System.out.println("Parameter: " + (decl instanceof ParameterDecl));
 			id.decl = decl;
 		}
 		return decl;

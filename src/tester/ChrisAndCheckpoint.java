@@ -105,6 +105,7 @@ public class ChrisAndCheckpoint {
                     failures++;
                 }
             }
+            System.out.println("=========================================================");
         }
         System.out.println(failures + " incorrect results in all.");     
     }

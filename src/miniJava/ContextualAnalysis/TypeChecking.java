@@ -218,12 +218,12 @@ public class TypeChecking implements Visitor<Object, TypeDenoter>{
 		}
 		
 		
-		boolean hasReturn = false;
+		//boolean hasReturn = false;
 		currentReturnType = md.type;
 		for (ParameterDecl pd: md.parameterDeclList) {
 			pd.visit(this, null);
 		}
-		TypeDenoter returnType = null;
+		//TypeDenoter returnType = null;
 		Statement returnStmt = null;
 		for (Statement st: md.statementList) {
 			st.visit(this, null);
@@ -475,13 +475,13 @@ public class TypeChecking implements Visitor<Object, TypeDenoter>{
 		
 		if (isRelationalOperator(expr.operator)) {
 			
-			if (! (leftType instanceof BaseType) || leftType.typeKind != TypeKind.INT) {
+			if (! (leftType instanceof BaseType) || (leftType.typeKind != TypeKind.INT && leftType.typeKind != TypeKind.ERROR)) {
 				report(expr.left.posn.start, "Type", "Relational operators can only be applied to type INT");
 				//reporter.reportError("*** Relational operators can only be applied to integers, line: " + expr.left.posn.start);;
 				expr.type = new BaseType(TypeKind.ERROR, null);
 				return new BaseType(TypeKind.ERROR, null);
 			}
-			if (! (rightType instanceof BaseType) || rightType.typeKind != TypeKind.INT) {
+			if (! (rightType instanceof BaseType) || (rightType.typeKind != TypeKind.INT && rightType.typeKind != TypeKind.ERROR)) {
 				report(expr.right.posn.start, "Type", "Relational operators can only be applied to type INT");
 				//reporter.reportError("*** Relational operators can only be applied to integers, line: " + expr.right.posn.start);;
 				expr.type = new BaseType(TypeKind.ERROR, null);
@@ -500,13 +500,13 @@ public class TypeChecking implements Visitor<Object, TypeDenoter>{
 				return new BaseType(TypeKind.BOOLEAN, null);
 			}
 		} else if (isLogicalOperator(expr.operator)) {
-			if (!(leftType instanceof BaseType) || leftType.typeKind != TypeKind.BOOLEAN) {
+			if (!(leftType instanceof BaseType) || (leftType.typeKind != TypeKind.BOOLEAN && leftType.typeKind != TypeKind.ERROR)) {
 				report(expr.operator.posn.start, "Type", "Logical operator can only be applied to type BOOLEAN");
 				//reporter.reportError("*** Logical operator can only be applied to booleans, line: " + expr.operator.posn.start);
 				expr.type = new BaseType(TypeKind.ERROR, null);
 				return new BaseType(TypeKind.ERROR, null);
 			}
-			if (!(rightType instanceof BaseType) || rightType.typeKind != TypeKind.BOOLEAN) {
+			if (!(rightType instanceof BaseType) || (rightType.typeKind != TypeKind.BOOLEAN && rightType.typeKind != TypeKind.ERROR)) {
 				report(expr.operator.posn.start, "Type", "Logical operator can only be applied to type BOOLEAN");
 				//reporter.reportError("*** Logical operator can only be applied to booleans, line: " + expr.operator.posn.start);
 				expr.type = new BaseType(TypeKind.ERROR, null);
@@ -515,13 +515,13 @@ public class TypeChecking implements Visitor<Object, TypeDenoter>{
 			expr.type = new BaseType(TypeKind.BOOLEAN, null);
 			return new BaseType(TypeKind.BOOLEAN, null);
 		} else if (isArithmeticOperator(expr.operator)) {
-			if (!(leftType instanceof BaseType) || leftType.typeKind != TypeKind.INT) {
+			if (!(leftType instanceof BaseType) || (leftType.typeKind != TypeKind.INT && leftType.typeKind != TypeKind.ERROR)) {
 				report(expr.operator.posn.start, "Type", "Arithmetic operator can only be applied to type INT");
 				//reporter.reportError("*** Arithmetic operator can only be applied to integers, line: " + expr.operator.posn.start);
 				expr.type = new BaseType(TypeKind.ERROR, null);
 				return new BaseType(TypeKind.ERROR, null);
 			}
-			if (!(rightType instanceof BaseType) || rightType.typeKind != TypeKind.INT) {
+			if (!(rightType instanceof BaseType) || (rightType.typeKind != TypeKind.INT && rightType.typeKind != TypeKind.ERROR)) {
 				report(expr.operator.posn.start, "Type", "Arithmetic operator can only be applied to type INT");
 				//reporter.reportError("*** Arithmetic operator can only be applied to integers, line: " + expr.operator.posn.start);
 				expr.type = new BaseType(TypeKind.ERROR, null);
