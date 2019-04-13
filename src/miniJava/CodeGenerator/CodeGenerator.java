@@ -41,25 +41,44 @@ import mJAM.ObjectFile;
 import mJAM.Instruction;
 
 public class CodeGenerator implements Visitor<Object, Object>{
-
+	/*
+	 * Need to visit all decls and generate runtime entities for them
+	 * 
+	 * Decls dont deal with frames?
+	 */
+	
+	
+	public void encodeRun() {
+		
+	}
 	
 	@Override
 	public Object visitPackage(Package prog, Object arg) {
+		Machine.emit(Op.LOADL, 0);
+		Machine.emit(Prim.newarr);
 		for (ClassDecl cd : prog.classDeclList) {
 			cd.visit(this, arg);
 		}
-		Machine.emit(Op.HALT, 0, 0, 0);
+		// Do preamble + call main method??
+		//Machine.emit(Op.HALT, 0, 0, 0);
 		return null;
 	}
 
 	@Override
 	public Object visitClassDecl(ClassDecl cd, Object arg) {
-		
+		int numFields = cd.fieldDeclList.size();
+		cd.RED = new KnownAddress(numFields, 0, 0);
+		int count = 0;
+		for (FieldDecl fd: cd.fieldDeclList) {
+			fd.visit(this, null);
+			((KnownAddress)fd.RED).address.displacement = count;
+		}
 		return null;
 	}
 
 	@Override
 	public Object visitFieldDecl(FieldDecl fd, Object arg) {
+		fd.RED = new KnownAddress(1, 1, 0);
 		
 		return null;
 	}
@@ -180,6 +199,7 @@ public class CodeGenerator implements Visitor<Object, Object>{
 
 	@Override
 	public Object visitNewObjectExpr(NewObjectExpr expr, Object arg) {
+		Machine.emit(Op.LOADL, -1);
 		
 		return null;
 	}

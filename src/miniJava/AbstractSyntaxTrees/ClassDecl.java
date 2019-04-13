@@ -13,12 +13,19 @@ public class ClassDecl extends Declaration {
 	  super(cn, null, posn);
 	  fieldDeclList = fdl;
 	  methodDeclList = mdl;
+	  hasMain = false;
   }
   
   public <A,R> R visit(Visitor<A, R> v, A o) {
       return v.visitClassDecl(this, o);
   }
+  
+  public int getNumFields() {
+	  return fieldDeclList.size() + methodDeclList.size();
+  }
       
   public FieldDeclList fieldDeclList;
   public MethodDeclList methodDeclList;
+  
+  public boolean hasMain;
 }

@@ -1,0 +1,50 @@
+/**************************************************************
+ * miniJava PA4 feature test
+ *
+ *   use this to check contextual analysis and code
+ *   generation for successively more adventurous
+ *   miniJava constructs.
+ *
+ *   uncomment System.out.println(x) statements once
+ *     you have sufficient functionality
+ *   
+ *   When interpreted using mJAM the compiled code 
+ *   should print 1 ... 15 999
+ *
+ **************************************************************/
+
+/*************
+ *  mainclass
+ */
+class PA4Test
+{
+    public static void main(String[] args)
+    {        
+        /* 1: simple literal */
+        int x = 1;
+        // System.out.println(x);  
+        
+        /* 2: simple expression */
+        x = 2 * x + x - 1;
+        // System.out.println(x);  
+
+        /* 3: System.out.println */
+        System.out.println(3);
+         
+        /* 4: conditional statement */
+        if (x != -1)
+        	System.out.println(4);
+        else
+            System.out.println(-1);
+        
+        /* 5: repetitive statement */
+        int i = 0;
+        while (i < 5) {
+            i = i + 1;
+            x = i;
+        }
+        System.out.println(x);
+        
+        
+    }
+}

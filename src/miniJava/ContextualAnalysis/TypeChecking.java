@@ -52,6 +52,8 @@ public class TypeChecking implements Visitor<Object, TypeDenoter>{
 	private ErrorReporter reporter;
 	private Map<String, ClassDecl> classDecls;
 	
+	private ClassDecl currentDecl;
+	
 	private TypeDenoter currentReturnType;
 	
 	private boolean hasMain;
@@ -182,6 +184,7 @@ public class TypeChecking implements Visitor<Object, TypeDenoter>{
 
 	@Override
 	public TypeDenoter visitClassDecl(ClassDecl cd, Object arg) {
+		currentDecl = cd;
 		for (MethodDecl md: cd.methodDeclList) {
 			md.visit(this, null);
 		}
@@ -212,6 +215,8 @@ public class TypeChecking implements Visitor<Object, TypeDenoter>{
 					System.exit(4);
 				} else {
 					hasMain = true;
+					md.isMain = true;
+					currentDecl.hasMain = true;
 				}
 				
 			}
