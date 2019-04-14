@@ -44,4 +44,29 @@
  43         JUMPIF (1)   L14
  44         LOAD         3[LB]
  45         CALL         putintnl
- 46         RETURN (0)   1
+ 46         LOADL        75
+ 47         LOADL        50
+ 48         LOADL        25
+ 49         CALL         L18
+ 50         CALL         putintnl
+ 51         LOADL        500
+ 52         CALL         putintnl
+ 53         LOADL        1000
+ 54         LOADL        100
+ 55         CALL         L19
+ 56         JUMPIF (1)   L16
+ 57         JUMP         L17
+ 58  L16:   LOADL        3
+ 59         CALL         neg     
+ 60         CALL         putintnl
+ 61  L17:   RETURN (0)   1
+ 62  L18:   LOAD         -1[LB]
+ 63         LOAD         -2[LB]
+ 64         CALL         add     
+ 65         LOAD         -3[LB]
+ 66         CALL         add     
+ 67         RETURN (1)   3
+ 68  L19:   LOAD         -1[LB]
+ 69         LOAD         -2[LB]
+ 70         CALL         eq      
+ 71         RETURN (1)   2

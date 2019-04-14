@@ -8,6 +8,13 @@ public class REDPrinter {
 	
 	public static void printClassDecl(ClassDecl cd) {
 		System.out.println("RED for " + cd.name);
+		
+		if (cd.getNumberInstanceFields() == 0) {
+			System.out.println("No Fields\n\n\n");
+			return;
+		}
+		
+		
 		RuntimeEntity x = cd.RED;
 		int length = 1+ x.size * 6;
 		printLine(length);
@@ -35,6 +42,7 @@ public class REDPrinter {
 		System.out.print(new String(middle) + "|");
 		System.out.println();
 		printLine(length);
+		System.out.println("\n\n\n");
 		
 	}
 	

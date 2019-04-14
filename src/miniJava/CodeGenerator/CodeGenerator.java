@@ -11,6 +11,8 @@ import miniJava.AbstractSyntaxTrees.CallExpr;
 import miniJava.AbstractSyntaxTrees.CallStmt;
 import miniJava.AbstractSyntaxTrees.ClassDecl;
 import miniJava.AbstractSyntaxTrees.ClassType;
+import miniJava.AbstractSyntaxTrees.Declaration;
+import miniJava.AbstractSyntaxTrees.Expression;
 import miniJava.AbstractSyntaxTrees.FieldDecl;
 import miniJava.AbstractSyntaxTrees.IdRef;
 import miniJava.AbstractSyntaxTrees.Identifier;
@@ -40,6 +42,12 @@ import miniJava.AbstractSyntaxTrees.WhileStmt;
 import mJAM.Machine;
 import mJAM.Machine.*;
 import mJAM.ObjectFile;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import mJAM.Instruction;
 
 public class CodeGenerator implements Visitor<Object, Object>{
@@ -49,10 +57,33 @@ public class CodeGenerator implements Visitor<Object, Object>{
 	 * Decls dont deal with frames?
 	 */
 	
-	int mainMethodAddr = 0;
+	public int mainMethodAddr = 0;
 	
-	int varDeclOffset = 0;
-	MethodDecl currMethod;
+	public int varDeclOffset = 0;
+	public int parameterDeclOffset = 0;
+	public MethodDecl currMethod;
+	
+	public Map<MethodDecl, List<Integer>> backPatchMap;
+	
+	private void addToMap(MethodDecl md, int addr) {
+		if (backPatchMap.containsKey(md)) {
+			backPatchMap.get(md).add(new Integer(addr));
+		} else {
+			backPatchMap.put(md, new ArrayList<Integer>());
+			backPatchMap.get(md).add(new Integer(addr));
+		}
+	}
+	
+	private void backPatch() {
+		List<MethodDecl> keys = new ArrayList<>(backPatchMap.keySet());
+		
+		for (MethodDecl md: keys) {
+			for (Integer offset: backPatchMap.get(md)) {
+				System.out.println(md.RED.offset);
+				Machine.patch(offset.intValue(), md.RED.offset);
+			}
+		}
+	}
 	
 	
 	public void encodeRun(AST ast) {
@@ -61,6 +92,9 @@ public class CodeGenerator implements Visitor<Object, Object>{
 	
 	@Override
 	public Object visitPackage(Package prog, Object arg) {
+		
+		backPatchMap = new HashMap<MethodDecl, List<Integer>>();
+		
 		/* Preamble */
 		Machine.emit(Op.LOADL, 0);
 		Machine.emit(Prim.newarr);
@@ -78,7 +112,7 @@ public class CodeGenerator implements Visitor<Object, Object>{
 		}
 		
 		Machine.patch(2, mainMethodAddr);
-		
+		backPatch();
 		return null;
 	}
 
@@ -102,22 +136,6 @@ public class CodeGenerator implements Visitor<Object, Object>{
 	@Override
 	public Object visitClassDecl(ClassDecl cd, Object arg) {
 		
-		/*
-		int numFields = cd.getNumberInstanceFields();
-		cd.RED = new RuntimeEntity(numFields, -1);
-		int count = 0;
-		
-		
-		// Non-static fields
-		for (FieldDecl fd: cd.fieldDeclList) {
-			if (fd.isStatic) {
-				continue;
-			}
-			fd.visit(this, null);
-			fd.RED.offset = count;
-			count += 1;
-		}
-		*/
 		/*
 		// static fields
 		for (FieldDecl fd: cd.fieldDeclList) {
@@ -146,22 +164,30 @@ public class CodeGenerator implements Visitor<Object, Object>{
 
 	@Override
 	public Object visitMethodDecl(MethodDecl md, Object arg) {
+		System.out.println("Visiting method decl: " + md.name);
 		varDeclOffset = 3;
+		parameterDeclOffset = -1;
 		currMethod = md;
 		
-		int addr = Machine.nextInstrAddr();
+		int startAddr = Machine.nextInstrAddr();
 		Frame frame = new Frame(0, 3);
 		if (md.isMain) {
-			mainMethodAddr = addr;
+			mainMethodAddr = startAddr;
 		}
+		
 		/*
 		 * TODO: Access parameters
 		 */
-		
+		for (ParameterDecl pd: md.parameterDeclList) {
+			pd.visit(this, null);
+		}
 		
 		for (Statement st: md.statementList) {
 			st.visit(this, frame);
 		}
+		
+		int endAddr = Machine.nextInstrAddr();
+		md.RED = new RuntimeEntity(endAddr - startAddr, startAddr);
 
 		return null;
 
@@ -169,7 +195,8 @@ public class CodeGenerator implements Visitor<Object, Object>{
 
 	@Override
 	public Object visitParameterDecl(ParameterDecl pd, Object arg) {
-		
+		pd.RED = new RuntimeEntity(1, parameterDeclOffset);
+		parameterDeclOffset -=1;
 		return null;
 	}
 
@@ -258,10 +285,29 @@ public class CodeGenerator implements Visitor<Object, Object>{
 				stmt.argList.get(0).visit(this, frame);
 				Machine.emit(Prim.putintnl);
 			}
+			return null;
 		} catch (ClassCastException e) {
 			
 		}
 		
+		
+		if (stmt.methodRef.decl.RED != null) {
+			// Have already visited this decl
+			for (int x = stmt.argList.size() - 1; x >= 0; x--) {
+				stmt.argList.get(x).visit(this, null);
+			}
+			Machine.emit(Op.CALL, stmt.methodRef.decl.RED.offset);
+		} else {
+			for (int x = stmt.argList.size() - 1; x >= 0; x--) {
+				stmt.argList.get(x).visit(this, null);
+			}
+			int addr2 = Machine.nextInstrAddr();
+			Machine.emit(Op.CALL, Reg.CB, 0);
+			addToMap((MethodDecl)stmt.methodRef.decl, addr2);
+			
+		}
+		//Machine.emit(Op.LOAD, stmt.methodRef.decl.RED.size);
+		//Machine.emit(Op.CALL, stmt.methodRef.decl.RED.offset);
 		
 		return null;
 	}
@@ -396,7 +442,21 @@ public class CodeGenerator implements Visitor<Object, Object>{
 
 	@Override
 	public Object visitCallExpr(CallExpr expr, Object arg) {
-		
+		if (expr.functionRef.decl.RED != null) {
+			// Have already visited this decl
+			for (int x = expr.argList.size() - 1; x >= 0; x--) {
+				expr.argList.get(x).visit(this, null);
+			}
+			Machine.emit(Op.CALL, expr.functionRef.decl.RED.offset);
+		} else {
+			for (int x = expr.argList.size() - 1; x >= 0; x--) {
+				expr.argList.get(x).visit(this, null);
+			}
+			int addr2 = Machine.nextInstrAddr();
+			Machine.emit(Op.CALL, Reg.CB, 0);
+			addToMap((MethodDecl)expr.functionRef.decl, addr2);
+			
+		}
 		return null;
 	}
 
@@ -408,8 +468,10 @@ public class CodeGenerator implements Visitor<Object, Object>{
 
 	@Override
 	public Object visitNewObjectExpr(NewObjectExpr expr, Object arg) {
+		Declaration temp = expr.classtype.className.decl;
 		Machine.emit(Op.LOADL, -1);
-		
+		Machine.emit(Op.LOADL, temp.RED.size);
+		Machine.emit(Prim.newobj);
 		return null;
 	}
 
@@ -427,13 +489,13 @@ public class CodeGenerator implements Visitor<Object, Object>{
 
 	@Override
 	public Object visitIdRef(IdRef ref, Object arg) {
-		System.out.println("===========================================================");
-		System.out.print("Visiting identifier: " + ref.id.spelling);
-		System.out.println(" with offset: " + ref.decl.RED.offset);
-		System.out.println("===========================================================");
+		//System.out.println("===========================================================");
+		//System.out.print("Visiting identifier: " + ref.id.spelling);
+		//System.out.println(" with offset: " + ref.decl.RED.offset);
+		//System.out.println("===========================================================");
 		Frame frame = (Frame) arg;
 		Machine.emit(Op.LOAD, Reg.LB, ref.decl.RED.offset);
-		System.out.println("IDREF");
+		//System.out.println("IDREF");
 		return null;
 	}
 
@@ -451,7 +513,7 @@ public class CodeGenerator implements Visitor<Object, Object>{
 
 	@Override
 	public Object visitIdentifier(Identifier id, Object arg) {
-		System.out.println("IDENTIFIER");
+		//System.out.println("IDENTIFIER");
 		return null;
 	}
 

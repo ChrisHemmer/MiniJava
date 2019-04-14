@@ -13,38 +13,67 @@
  *
  **************************************************************/
 
-/*************
- *  mainclass
- */
+
+ 
 class PA4Test
 {
-	int x;
-	int y;
-	PA4Test z;
+
+
+	
+
     public static void main(String[] args)
     {        
+        /* 1: simple literal */
         int x = 1;
-        boolean test = 5 < 4;
+        System.out.println(x);  
         
-        System.out.println(x);
-        
+        /* 2: simple expression */
         x = 2 * x + x - 1;
         System.out.println(x);  
+
+        /* 3: System.out.println */
         System.out.println(3);
          
-         
+        /* 4: conditional statement */
         if (x != -1)
         	System.out.println(4);
         else
             System.out.println(-1);
         
+        /* 5: repetitive statement */
         int i = 0;
         while (i < 5) {
             i = i + 1;
             x = i;
         }
-        System.out.println(i);
         System.out.println(x);
+        System.out.println(helper(25, 50, 75));
+        System.out.println(500);
         
+        
+        if (compareInts(100, 1000)){
+        	System.out.println(-3);
+        }
+        
+        //A a = new A();
+        //a.test();
+
     }
+    
+    public static int helper(int x, int y, int z){
+    	return x + y + z;
+    }
+    
+    public static boolean compareInts(int x, int y){
+    	return x == y;
+    }
+    
+    
 }
+
+/**********************************************************************
+ *
+ *  class A
+ */
+
+
