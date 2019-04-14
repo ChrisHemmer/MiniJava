@@ -63,6 +63,8 @@ public class CodeGenerator implements Visitor<Object, Object>{
 	public int parameterDeclOffset = 0;
 	public MethodDecl currMethod;
 	
+	public boolean assigning;
+	
 	public Map<MethodDecl, List<Integer>> backPatchMap;
 	
 	private void addToMap(MethodDecl md, int addr) {
@@ -79,7 +81,7 @@ public class CodeGenerator implements Visitor<Object, Object>{
 		
 		for (MethodDecl md: keys) {
 			for (Integer offset: backPatchMap.get(md)) {
-				System.out.println(md.RED.offset);
+				//System.out.println(md.RED.offset);
 				Machine.patch(offset.intValue(), md.RED.offset);
 			}
 		}
@@ -164,7 +166,7 @@ public class CodeGenerator implements Visitor<Object, Object>{
 
 	@Override
 	public Object visitMethodDecl(MethodDecl md, Object arg) {
-		System.out.println("Visiting method decl: " + md.name);
+		//System.out.println("Visiting method decl: " + md.name);
 		varDeclOffset = 3;
 		parameterDeclOffset = -1;
 		currMethod = md;
@@ -291,11 +293,15 @@ public class CodeGenerator implements Visitor<Object, Object>{
 		}
 		
 		
+		
 		if (stmt.methodRef.decl.RED != null) {
 			// Have already visited this decl
 			for (int x = stmt.argList.size() - 1; x >= 0; x--) {
 				stmt.argList.get(x).visit(this, null);
 			}
+			//if (!((MethodDecl)stmt.methodRef.decl).isStatic) {
+			//	Machine.emit(Op.LOAD);
+			//}
 			Machine.emit(Op.CALL, stmt.methodRef.decl.RED.offset);
 		} else {
 			for (int x = stmt.argList.size() - 1; x >= 0; x--) {
@@ -435,8 +441,10 @@ public class CodeGenerator implements Visitor<Object, Object>{
 
 	@Override
 	public Object visitRefExpr(RefExpr expr, Object arg) {
+		System.out.println("Visiting reference expression");
 		Frame frame = (Frame) arg;
 		expr.ref.visit(this, frame);
+		//Machine.emit(Prim.fieldref);
 		return null;
 	}
 
@@ -489,19 +497,16 @@ public class CodeGenerator implements Visitor<Object, Object>{
 
 	@Override
 	public Object visitIdRef(IdRef ref, Object arg) {
-		//System.out.println("===========================================================");
-		//System.out.print("Visiting identifier: " + ref.id.spelling);
-		//System.out.println(" with offset: " + ref.decl.RED.offset);
-		//System.out.println("===========================================================");
 		Frame frame = (Frame) arg;
 		Machine.emit(Op.LOAD, Reg.LB, ref.decl.RED.offset);
-		//System.out.println("IDREF");
 		return null;
 	}
 
 	@Override
 	public Object visitQRef(QualRef ref, Object arg) {
-		
+		System.out.println("Visiting QREF");
+		ref.ref.visit(this, null);
+		ref.id.visit(this, null);
 		return null;
 	}
 
@@ -513,7 +518,11 @@ public class CodeGenerator implements Visitor<Object, Object>{
 
 	@Override
 	public Object visitIdentifier(Identifier id, Object arg) {
-		//System.out.println("IDENTIFIER");
+		System.out.println("IDENTIFIER");
+		//if (!assigning) {
+			Machine.emit(Op.LOADL, id.decl.RED.offset);
+			Machine.emit(Prim.fieldref);
+		//}
 		return null;
 	}
 

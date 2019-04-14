@@ -44,29 +44,79 @@
  43         JUMPIF (1)   L14
  44         LOAD         3[LB]
  45         CALL         putintnl
- 46         LOADL        75
- 47         LOADL        50
- 48         LOADL        25
- 49         CALL         L18
- 50         CALL         putintnl
- 51         LOADL        500
- 52         CALL         putintnl
- 53         LOADL        1000
- 54         LOADL        100
- 55         CALL         L19
- 56         JUMPIF (1)   L16
- 57         JUMP         L17
- 58  L16:   LOADL        3
- 59         CALL         neg     
- 60         CALL         putintnl
- 61  L17:   RETURN (0)   1
- 62  L18:   LOAD         -1[LB]
- 63         LOAD         -2[LB]
- 64         CALL         add     
- 65         LOAD         -3[LB]
+ 46         LOADL        -1
+ 47         LOADL        1
+ 48         CALL         newobj  
+ 49         LOAD         5[LB]
+ 50         LOADL        0
+ 51         CALL         ne      
+ 52         JUMPIF (1)   L16
+ 53         JUMP         L17
+ 54  L16:   LOADL        6
+ 55         CALL         putintnl
+ 56  L17:   LOADL        0
+ 57         CALL         putintnl
+ 58         LOADL        0
+ 59         CALL         putintnl
+ 60         LOADL        0
+ 61         CALL         putintnl
+ 62         LOADL        7
+ 63         LOAD         5[LB]
+ 64         LOADL        0
+ 65         CALL         fieldref
  66         CALL         add     
- 67         RETURN (1)   3
- 68  L19:   LOAD         -1[LB]
- 69         LOAD         -2[LB]
- 70         CALL         eq      
- 71         RETURN (1)   2
+ 67         CALL         putintnl
+ 68         LOADL        8
+ 69         STORE        0[LB]
+ 70         LOAD         5[LB]
+ 71         LOADL        0
+ 72         CALL         fieldref
+ 73         CALL         putintnl
+ 74         RETURN (0)   1
+ 75  L18:   LOAD         -1[LB]
+ 76         LOADL        1
+ 77         CALL         neg     
+ 78         CALL         eq      
+ 79         JUMPIF (1)   L19
+ 80         JUMP         L20
+ 81  L19:   RETURN (0)   1
+ 82         JUMP         L21
+ 83  L20:   LOAD         -1[LB]
+ 84         CALL         putintnl
+ 85         LOAD         -1[LB]
+ 86         LOADL        1
+ 87         CALL         sub     
+ 88         CALL         L18
+ 89         JUMP         L21
+ 90  L21:   RETURN (0)   1
+ 91         LOAD         -1[LB]
+ 92         LOAD         -2[LB]
+ 93         CALL         add     
+ 94         LOAD         -3[LB]
+ 95         CALL         add     
+ 96         RETURN (1)   3
+ 97         LOAD         -1[LB]
+ 98         LOAD         -2[LB]
+ 99         CALL         eq      
+100         RETURN (1)   2
+101         LOADL        0
+102         JUMP         L23
+103  L22:   LOADL        0
+104         CALL         putintnl
+105         LOAD         3[LB]
+106         LOADL        1
+107         CALL         add     
+108         STORE        3[LB]
+109  L23:   LOAD         3[LB]
+110         LOADL        5
+111         CALL         lt      
+112         JUMPIF (1)   L22
+113         RETURN (0)   0
+114         LOADL        15
+115         STORE        0[LB]
+116         LOAD         0[LB]
+117         CALL         putintnl
+118         RETURN (0)   0
+119         LOAD         -1[LB]
+120         STORE        0[LB]
+121         RETURN (0)   1

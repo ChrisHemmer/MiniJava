@@ -114,7 +114,7 @@ public class Compiler {
 		else {
 			System.out.println("Passed Type Checking");
 			System.out.println("Valid miniJava program");
-			//new ASTDisplay().showTree(ast);
+			new ASTDisplay().showTree(ast);
 		}
 		new CodeGenerator().encodeRun(ast);
 		new ObjectFile("test.mJAM").write();

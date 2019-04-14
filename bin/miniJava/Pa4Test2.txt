@@ -23,41 +23,45 @@ class PA4Test
 
     public static void main(String[] args)
     {        
-        /* 1: simple literal */
+    
         int x = 1;
-        System.out.println(x);  
-        
-        /* 2: simple expression */
+        System.out.println(x);
         x = 2 * x + x - 1;
-        System.out.println(x);  
-
-        /* 3: System.out.println */
+        System.out.println(x);
         System.out.println(3);
-         
-        /* 4: conditional statement */
         if (x != -1)
         	System.out.println(4);
         else
             System.out.println(-1);
-        
-        /* 5: repetitive statement */
         int i = 0;
         while (i < 5) {
             i = i + 1;
             x = i;
         }
         System.out.println(x);
-        System.out.println(helper(25, 50, 75));
-        System.out.println(500);
         
-        
-        if (compareInts(100, 1000)){
-        	System.out.println(-3);
+        A a = new A();
+        if (a != null){
+        	System.out.println(6);
         }
+        System.out.println(0);
+        System.out.println(0);
+        System.out.println(0);
+        System.out.println(7 + a.n);
+        a.n = 8;
+        System.out.println(a.n);
         
-        //A a = new A();
-        //a.test();
 
+    }
+    
+    public static void countdown(int x){
+    	if (x == -1){
+    		return;
+    	} else{
+    		System.out.println(x);
+    		countdown(x-1);	
+    	}
+    
     }
     
     public static int helper(int x, int y, int z){
@@ -68,6 +72,15 @@ class PA4Test
     	return x == y;
     }
     
+    public static void printZero(){
+    	int x = 0;
+    	
+    	while (x < 5){
+    		System.out.println(0);
+    		x = x + 1;
+    	}
+    }
+    
     
 }
 
@@ -75,5 +88,19 @@ class PA4Test
  *
  *  class A
  */
+ 
+ class A{
+ 	int n;
+ 	public void start(){
+ 		n = 15;
+ 		System.out.println(n);
+ 	}
+ 	
+ 	public void setN(int x){
+ 		n = x;
+ 	}
+ 
+ 
+ }
 
 
