@@ -18,33 +18,33 @@
  */
 class PA4Test
 {
+	int x;
+	int y;
+	PA4Test z;
     public static void main(String[] args)
     {        
-        /* 1: simple literal */
         int x = 1;
-        // System.out.println(x);  
+        boolean test = 5 < 4;
         
-        /* 2: simple expression */
+        System.out.println(x);
+        
         x = 2 * x + x - 1;
-        // System.out.println(x);  
-
-        /* 3: System.out.println */
+        System.out.println(x);  
         System.out.println(3);
          
-        /* 4: conditional statement */
+         
         if (x != -1)
         	System.out.println(4);
         else
             System.out.println(-1);
         
-        /* 5: repetitive statement */
         int i = 0;
         while (i < 5) {
             i = i + 1;
             x = i;
         }
+        System.out.println(i);
         System.out.println(x);
-        
         
     }
 }

@@ -35,8 +35,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
+import mJAM.Disassembler;
+import mJAM.Interpreter;
+import mJAM.ObjectFile;
 import miniJava.AbstractSyntaxTrees.AST;
 import miniJava.AbstractSyntaxTrees.ASTDisplay;
+import miniJava.CodeGenerator.CodeGenerator;
 import miniJava.ContextualAnalysis.Identification;
 import miniJava.ContextualAnalysis.TypeChecking;
 import miniJava.SyntacticAnalyzer.Parser;
@@ -110,10 +114,15 @@ public class Compiler {
 		else {
 			System.out.println("Passed Type Checking");
 			System.out.println("Valid miniJava program");
-			new ASTDisplay().showTree(ast);
-			System.exit(0);
+			//new ASTDisplay().showTree(ast);
 		}
-		
+		new CodeGenerator().encodeRun(ast);
+		new ObjectFile("test.mJAM").write();
+		System.out.println("\n\nDisassembling...");
+		new Disassembler("test.mJAM").disassemble();
+		System.out.println("\n\n\n");
+		System.out.println("Running...");
+		Interpreter.interpret("test.mJAM");
 		// END: Checking results of Type Checking 
 		
 		

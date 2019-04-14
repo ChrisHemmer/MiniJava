@@ -890,6 +890,8 @@ public class Parser {
 
 	// show parse stack whenever terminal is  accepted
 	private void pTrace() {
+		return;
+		/*
 		StackTraceElement [] stl = Thread.currentThread().getStackTrace();
 		for (int i = stl.length - 1; i > 0 ; i--) {
 			if(stl[i].toString().contains("parse"))
@@ -897,6 +899,7 @@ public class Parser {
 		}
 		System.out.println("accepting: " + token.kind + " (\"" + token.spelling + "\")");
 		System.out.println();
+		*/
 	}
 	
 
