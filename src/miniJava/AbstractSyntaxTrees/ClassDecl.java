@@ -20,8 +20,14 @@ public class ClassDecl extends Declaration {
       return v.visitClassDecl(this, o);
   }
   
-  public int getNumFields() {
-	  return fieldDeclList.size() + methodDeclList.size();
+  public int getNumberInstanceFields() {
+	  int count = 0;
+	  for (FieldDecl fd: fieldDeclList) {
+		  if (!fd.isStatic) {
+			  count += 1;
+		  }
+	  }
+	  return count;
   }
       
   public FieldDeclList fieldDeclList;

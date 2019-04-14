@@ -24,7 +24,6 @@ class PA4Test
     public static void main(String[] args)
     {        
         int x = 1;
-        boolean test = 5 < 4;
         
         System.out.println(x);
         
@@ -38,13 +37,12 @@ class PA4Test
         else
             System.out.println(-1);
         
-        int i = 0;
-        while (i < 5) {
+       int i = 0;
+       while (i < 5) {
             i = i + 1;
             x = i;
         }
-        System.out.println(i);
-        System.out.println(x);
+      System.out.println(x);
         
     }
 }

@@ -5,6 +5,8 @@
  */
 package mJAM;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
@@ -252,6 +254,11 @@ public class Disassembler {
 		// close output file
 		try {
 			asmOut.close();
+			BufferedReader br = new BufferedReader(new FileReader(asmFileName));
+			String line = null;
+			while((line = br.readLine()) != null) {
+				System.out.println(line);
+			}
 		} catch (IOException e) {
 			error = true;
 		}
