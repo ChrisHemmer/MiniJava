@@ -14,6 +14,9 @@
  **************************************************************/
 
 
+
+
+
  
 class PA4Test
 {
@@ -24,15 +27,29 @@ class PA4Test
     public static void main(String[] args)
     {        
     
-    	//printZero();
-        int x = 1;
-        System.out.println(x);
-        x = 50;
-        System.out.println(x);
-      
+    	
+        
+        
+        A a = new A();
+        
+        //A b = new A();
+        //System.out.println(a.n);
+        //System.out.println(b.n);
+      	//a.n = 1234;
+      	//System.out.println(a.n);
+      	//System.out.println(b.n);
+      	//b.n = -16;
+      	//System.out.println(a.n);
+      	//System.out.println(b.n);
+      	
+      	
+      	System.out.println(11111);
+      	a.setN(52);
+      	//System.out.println(a.n);
         
 
     }
+    
     
     /*
     public static void countdown(int x){
@@ -53,7 +70,7 @@ class PA4Test
     	return x == y;
     }
     
-    */
+    
     public static void printZero(){
     	int x = 0;
     	
@@ -62,6 +79,7 @@ class PA4Test
     		x = x + 1;
     	}
     }
+    */
     
     
     
@@ -71,13 +89,13 @@ class PA4Test
  *
  *  class A
  */
- 
- class A{
+  class A{
+ 	int x;
  	int n;
- 	public void start(){
- 		n = 15;
- 		System.out.println(n);
- 	}
+ 	//public void start(){
+ 	//	n = 15;
+ 	//	System.out.println(n);
+ 	//}
  	
  	public void setN(int x){
  		n = x;
@@ -85,5 +103,6 @@ class PA4Test
  
  
  }
+
 
 
