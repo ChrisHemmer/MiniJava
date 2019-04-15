@@ -12,7 +12,6 @@ import miniJava.AbstractSyntaxTrees.CallStmt;
 import miniJava.AbstractSyntaxTrees.ClassDecl;
 import miniJava.AbstractSyntaxTrees.ClassType;
 import miniJava.AbstractSyntaxTrees.Declaration;
-import miniJava.AbstractSyntaxTrees.Expression;
 import miniJava.AbstractSyntaxTrees.FieldDecl;
 import miniJava.AbstractSyntaxTrees.IdRef;
 import miniJava.AbstractSyntaxTrees.Identifier;
@@ -30,6 +29,7 @@ import miniJava.AbstractSyntaxTrees.Package;
 import miniJava.AbstractSyntaxTrees.ParameterDecl;
 import miniJava.AbstractSyntaxTrees.QualRef;
 import miniJava.AbstractSyntaxTrees.RefExpr;
+import miniJava.AbstractSyntaxTrees.Reference;
 import miniJava.AbstractSyntaxTrees.ReturnStmt;
 import miniJava.AbstractSyntaxTrees.Statement;
 import miniJava.AbstractSyntaxTrees.ThisRef;
@@ -41,14 +41,21 @@ import miniJava.AbstractSyntaxTrees.WhileStmt;
 
 import mJAM.Machine;
 import mJAM.Machine.*;
-import mJAM.ObjectFile;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import mJAM.Instruction;
+
+
+/**************************************************
+ * TODO:
+ * 	Alter method calls to allow for static or non-static methods
+ * 
+ * 
+ *
+ **************************************************/
 
 public class CodeGenerator implements Visitor<Object, Object>{
 	/*
@@ -100,8 +107,8 @@ public class CodeGenerator implements Visitor<Object, Object>{
 		/* Preamble */
 		Machine.emit(Op.LOADL, 0);
 		Machine.emit(Prim.newarr);
-		Machine.emit(Op.CALL, 0, Reg.CB, 1);
 		int tempAddr = Machine.nextInstrAddr();
+		Machine.emit(Op.CALL, 0, Reg.CB, 1);
 		Machine.emit(Op.HALT, 0, 0, 0);
 		
 		for (ClassDecl cd : prog.classDeclList) {
@@ -113,7 +120,7 @@ public class CodeGenerator implements Visitor<Object, Object>{
 			cd.visit(this, arg);
 		}
 		
-		Machine.patch(2, mainMethodAddr);
+		Machine.patch(tempAddr, mainMethodAddr);
 		backPatch();
 		return null;
 	}
@@ -166,7 +173,6 @@ public class CodeGenerator implements Visitor<Object, Object>{
 
 	@Override
 	public Object visitMethodDecl(MethodDecl md, Object arg) {
-		//System.out.println("Visiting method decl: " + md.name);
 		varDeclOffset = 3;
 		parameterDeclOffset = -1;
 		currMethod = md;
@@ -177,9 +183,6 @@ public class CodeGenerator implements Visitor<Object, Object>{
 			mainMethodAddr = startAddr;
 		}
 		
-		/*
-		 * TODO: Access parameters
-		 */
 		for (ParameterDecl pd: md.parameterDeclList) {
 			pd.visit(this, null);
 		}
@@ -204,9 +207,6 @@ public class CodeGenerator implements Visitor<Object, Object>{
 
 	@Override
 	public Object visitVarDecl(VarDecl decl, Object arg) {
-		
-		//Frame frame = (Frame) arg;
-		//decl.RED = new RuntimeEntity(1, frame.size);
 		decl.RED = new RuntimeEntity(1, varDeclOffset);
 		varDeclOffset += 1;
 		return null;
@@ -271,7 +271,16 @@ public class CodeGenerator implements Visitor<Object, Object>{
 	@Override
 	public Object visitAssignStmt(AssignStmt stmt, Object arg) {
 		stmt.val.visit(this, null);
-		Machine.emit(Op.STORE, 1, Reg.LB, stmt.ref.decl.RED.offset);
+		encodeStore(stmt.ref);
+		/*
+		if (stmt.ref instanceof IdRef) {
+			stmt.val.visit(this, null);
+			Machine.emit(Op.STORE, 1, Reg.LB, stmt.ref.decl.RED.offset);
+		} else {
+			// need to use fieldupd
+			//stmt.val.visit(this, null);
+		}
+		*/
 		return null;
 	}
 
@@ -289,7 +298,6 @@ public class CodeGenerator implements Visitor<Object, Object>{
 			}
 			return null;
 		} catch (ClassCastException e) {
-			
 		}
 		
 		
@@ -299,9 +307,6 @@ public class CodeGenerator implements Visitor<Object, Object>{
 			for (int x = stmt.argList.size() - 1; x >= 0; x--) {
 				stmt.argList.get(x).visit(this, null);
 			}
-			//if (!((MethodDecl)stmt.methodRef.decl).isStatic) {
-			//	Machine.emit(Op.LOAD);
-			//}
 			Machine.emit(Op.CALL, stmt.methodRef.decl.RED.offset);
 		} else {
 			for (int x = stmt.argList.size() - 1; x >= 0; x--) {
@@ -439,12 +444,12 @@ public class CodeGenerator implements Visitor<Object, Object>{
 		return null;
 	}
 
+	
+	// TODO: Issues with references
 	@Override
 	public Object visitRefExpr(RefExpr expr, Object arg) {
 		System.out.println("Visiting reference expression");
-		Frame frame = (Frame) arg;
-		expr.ref.visit(this, frame);
-		//Machine.emit(Prim.fieldref);
+		encodeFetch(expr.ref);
 		return null;
 	}
 
@@ -489,12 +494,19 @@ public class CodeGenerator implements Visitor<Object, Object>{
 		return null;
 	}
 
+	/********************************************************************************************************
+	 * End: Expressions
+	 * 
+	 * Start: References
+	 *******************************************************************************************************/
+	
+	// TODO: Issues with references
 	@Override
 	public Object visitThisRef(ThisRef ref, Object arg) {
 		
 		return null;
 	}
-
+	// TODO: Issues with references
 	@Override
 	public Object visitIdRef(IdRef ref, Object arg) {
 		Frame frame = (Frame) arg;
@@ -506,7 +518,7 @@ public class CodeGenerator implements Visitor<Object, Object>{
 	public Object visitQRef(QualRef ref, Object arg) {
 		System.out.println("Visiting QREF");
 		ref.ref.visit(this, null);
-		ref.id.visit(this, null);
+		//ref.id.visit(this, null);
 		return null;
 	}
 
@@ -516,6 +528,13 @@ public class CodeGenerator implements Visitor<Object, Object>{
 		return null;
 	}
 
+	/********************************************************************************************************
+	 * End: References
+	 * 
+	 * Start: Misc.
+	 *******************************************************************************************************/
+	
+	
 	@Override
 	public Object visitIdentifier(Identifier id, Object arg) {
 		System.out.println("IDENTIFIER");
@@ -572,6 +591,12 @@ public class CodeGenerator implements Visitor<Object, Object>{
 		return null;
 	}
 
+	
+	/********************************************************************************************************
+	 * End: Misc.
+	 * 
+	 * Start: Literals
+	 *******************************************************************************************************/
 	@Override
 	public Object visitIntLiteral(IntLiteral num, Object arg) {
 		Machine.emit(Op.LOADL, Integer.parseInt(num.spelling));
@@ -594,5 +619,37 @@ public class CodeGenerator implements Visitor<Object, Object>{
 		Machine.emit(Op.LOADL, 0);
 		return null;
 	}
+	
+	/********************************************************************************************************
+	 * End: Literals
+	 * 
+	 * Start: Encode Store/Fetch
+	 *******************************************************************************************************/
 
+	public void encodeStore(Reference ref) {
+		Declaration decl = ref.decl;
+		if (decl instanceof VarDecl || decl instanceof ParameterDecl) {
+			// LocalDecl (DONE)
+			Machine.emit(Op.STORE, 0, Reg.LB, decl.RED.offset);
+		} else {
+			// Member decl
+			//TODO
+			Machine.emit(Op.STORE, 0, Reg.OB, decl.RED.offset);
+		}
+	}
+	
+	
+	public void encodeFetch(Reference ref) {
+		Declaration decl = ref.decl;
+		if (decl instanceof VarDecl || decl instanceof ParameterDecl) {
+			// LocalDecl (DONE)
+			Machine.emit(Op.LOAD, Reg.LB, ref.decl.RED.offset);
+		} else {
+			// Member decl
+			//TODO
+			Machine.emit(Op.LOAD, Reg.OB, ref.decl.RED.offset);
+		}
+	}
+	
+	
 }
