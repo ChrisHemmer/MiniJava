@@ -16,7 +16,16 @@
 
 
 
-
+  class A{
+ 	int x;
+ 	int n;
+ 	A test;
+ 	
+ 	public void setN(int x){
+ 	}
+ 
+ 
+ }
  
 class PA4Test
 {
@@ -26,32 +35,36 @@ class PA4Test
 
     public static void main(String[] args)
     {        
-    
+    	System.out.println(1);
+    	A a = new A();
+    	System.out.println(2);
+    	a.x = 4;
+    	System.out.println(3);
+    	a.test = new A();
+    	//System.out.println(4);
+    	System.out.println(0);
+    	System.out.println(a.x);
     	
-        
-        
-        A a = new A();
-        
-        //A b = new A();
-        //System.out.println(a.n);
-        //System.out.println(b.n);
-      	//a.n = 1234;
-      	//System.out.println(a.n);
-      	//System.out.println(b.n);
-      	//b.n = -16;
-      	//System.out.println(a.n);
-      	//System.out.println(b.n);
-      	
-      	
-      	System.out.println(11111);
-      	a.setN(52);
-      	//System.out.println(a.n);
+    	
+    	
+    	a.test.x = 15;
+    	System.out.println(3);
+    	System.out.println(3);
+    	System.out.println(a.x);
+    	a.x = 1050;
+    	System.out.println(a.x);
+    	
+    	a.test.test = new A();
+    	a.test.test.x = 150;
+    	//System.out.println(a.test.x);
+    	
+    	
         
 
     }
     
-    
     /*
+    
     public static void countdown(int x){
     	if (x == -1){
     		return;
@@ -79,30 +92,12 @@ class PA4Test
     		x = x + 1;
     	}
     }
-    */
     
+    */
     
     
 }
 
-/**********************************************************************
- *
- *  class A
- */
-  class A{
- 	int x;
- 	int n;
- 	//public void start(){
- 	//	n = 15;
- 	//	System.out.println(n);
- 	//}
- 	
- 	public void setN(int x){
- 		n = x;
- 	}
- 
- 
- }
 
 
 

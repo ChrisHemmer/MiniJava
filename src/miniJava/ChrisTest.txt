@@ -1,48 +1,15 @@
-/**************************************************************
- * miniJava PA4 feature test
- *
- *   use this to check contextual analysis and code
- *   generation for successively more adventurous
- *   miniJava constructs.
- *
- *   uncomment System.out.println(x) statements once
- *     you have sufficient functionality
- *   
- *   When interpreted using mJAM the compiled code 
- *   should print 1 ... 15 999
- *
- **************************************************************/
+class Counter {
 
-/*************
- *  mainclass
- */
-class PA4Test
-{
-	int x;
-	int y;
-	PA4Test z;
-    public static void main(String[] args)
-    {        
-        int x = 1;
-        
-        System.out.println(x);
-        
-        x = 2 * x + x - 1;
-        System.out.println(x);  
-        System.out.println(3);
-         
-         
-        if (x != -1)
-        	System.out.println(4);
-        else
-            System.out.println(-1);
-        
-       int i = 0;
-       while (i < 5) {
-            i = i + 1;
-            x = i;
-        }
-      System.out.println(x);
-        
+    public void increase(int k) {
+	count = count + k;
     }
+
+    public static void main(String [] args){
+	Counter counter = new Counter();
+	counter.increase(3);
+	System.out.println(counter.count);
+    }
+
+    public int count;
+
 }

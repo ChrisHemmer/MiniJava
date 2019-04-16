@@ -1,0 +1,35 @@
+ 12         LOAD         3[LB]
+ 13         LOADL        0
+ 14         LOADL        4
+ 15         CALL         fieldupd
+
+ 
+ 
+ 12         LOAD         3[LB]
+ 13         LOAD         0[LB]
+ 14         LOAD         0[ZR]
+ 15         LOADL        4
+ 16         CALL         fieldupd
+ 
+ 
+ 28         LOAD         3[LB]
+ 29         LOADL        2
+ 30         LOADL        0
+ 
+ 
+ 31         LOADL        15
+ 32         CALL         fieldupd
+ 
+ 
+ 
+ FieldRef
+ 
+ 
+ 26         LOAD         3[LB]
+ 27         LOADL        0
+ 28         CALL         fieldref
+ 
+ 
+ 
+ 
+ 
