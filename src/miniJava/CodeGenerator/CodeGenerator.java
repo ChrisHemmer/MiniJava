@@ -20,6 +20,7 @@ import miniJava.AbstractSyntaxTrees.IfStmt;
 import miniJava.AbstractSyntaxTrees.IntLiteral;
 import miniJava.AbstractSyntaxTrees.IxRef;
 import miniJava.AbstractSyntaxTrees.LiteralExpr;
+import miniJava.AbstractSyntaxTrees.MemberDecl;
 import miniJava.AbstractSyntaxTrees.MethodDecl;
 import miniJava.AbstractSyntaxTrees.NewArrayExpr;
 import miniJava.AbstractSyntaxTrees.NewObjectExpr;
@@ -93,7 +94,6 @@ public class CodeGenerator implements Visitor<Object, Object>{
 		
 		for (MethodDecl md: keys) {
 			for (Integer offset: backPatchMap.get(md)) {
-				//System.out.println(md.RED.offset);
 				Machine.patch(offset.intValue(), md.RED.offset);
 			}
 		}
@@ -272,7 +272,6 @@ public class CodeGenerator implements Visitor<Object, Object>{
 			}
 		}
 		Machine.emit(Op.POP, popSize.intValue());
-		//System.out.println(popSize);
 		//Machine.emit(Op.POP, popSize);
 		return null;
 	}
@@ -291,16 +290,6 @@ public class CodeGenerator implements Visitor<Object, Object>{
 
 	@Override
 	public Object visitAssignStmt(AssignStmt stmt, Object arg) {
-		
-		//if (stmt.ref instanceof IxRef) {
-		//	IxRef temp = (IxRef)stmt.ref;
-		//	encodeFetch(temp.ref);
-		//	temp.indexExpr.visit(this, null);
-		//	System.out.println("ASSIGN ARRAY TYPE");
-		//	System.out.println(stmt.ref.decl.name);
-		//}
-		
-		
 		encodeStore(stmt.ref, stmt.val);
 	
 		return null;
@@ -309,7 +298,6 @@ public class CodeGenerator implements Visitor<Object, Object>{
 	//TODO: CallStmt
 	@Override
 	public Object visitCallStmt(CallStmt stmt, Object arg) {
-		System.out.println("VISITING CALL STATEMENT");
 		//Frame frame = (Frame) arg;
 		try {
 			QualRef a = (QualRef) stmt.methodRef;
@@ -335,7 +323,6 @@ public class CodeGenerator implements Visitor<Object, Object>{
 				
 				
 				if (stmt.methodRef instanceof QualRef) {
-					System.out.println("//////////////////////////////////////////////////////");
 					QualRef temp = (QualRef) stmt.methodRef;
 					encodeFetch(temp.ref);
 				} else {
@@ -367,7 +354,6 @@ public class CodeGenerator implements Visitor<Object, Object>{
 				addToMap((MethodDecl)stmt.methodRef.decl, addr2);
 			} else {
 				if (stmt.methodRef instanceof QualRef) {
-					System.out.println("//////////////////////////////////////////////////////");
 					QualRef temp = (QualRef) stmt.methodRef;
 					encodeFetch(temp.ref);
 				} else {
@@ -510,10 +496,8 @@ public class CodeGenerator implements Visitor<Object, Object>{
 	// TODO: Issues with references
 	@Override
 	public Object visitRefExpr(RefExpr expr, Object arg) {
-		System.out.println("Visiting reference expression");
 		
 		if (expr.ref instanceof QualRef) {
-			System.out.println("ITS A QUAL REF");
 			QualRef temp = (QualRef) expr.ref;
 			Declaration decl = temp.ref.decl;
 			TypeDenoter type = decl.type;
@@ -535,7 +519,7 @@ public class CodeGenerator implements Visitor<Object, Object>{
 
 	@Override
 	public Object visitCallExpr(CallExpr expr, Object arg) {
-		System.out.println("VISITING CALL EXPRESSION");
+		/*
 		if (expr.functionRef.decl.RED != null) {
 			// Have already visited this decl
 			for (int x = expr.argList.size() - 1; x >= 0; x--) {
@@ -551,6 +535,65 @@ public class CodeGenerator implements Visitor<Object, Object>{
 			addToMap((MethodDecl)expr.functionRef.decl, addr2);
 			
 		}
+		return null;
+		*/
+		MethodDecl md = (MethodDecl) expr.functionRef.decl;
+		if (expr.functionRef.decl.RED != null) {
+			// Have already visited this decl
+			for (int x = expr.argList.size() - 1; x >= 0; x--) {
+				expr.argList.get(x).visit(this, null);
+			}
+			if (md.isStatic) {
+				Machine.emit(Op.CALL, expr.functionRef.decl.RED.offset);
+			} else {
+				
+				
+				if (expr.functionRef instanceof QualRef) {
+					QualRef temp = (QualRef) expr.functionRef;
+					encodeFetch(temp.ref);
+				} else {
+					Machine.emit(Op.LOADA, Reg.OB, 0);
+				}
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				Machine.emit(Op.CALLI, Reg.CB, expr.functionRef.decl.RED.offset);
+			}
+		} else {
+			for (int x = expr.argList.size() - 1; x >= 0; x--) {
+				expr.argList.get(x).visit(this, null);
+			}
+			if (md.isStatic) {
+				int addr2 = Machine.nextInstrAddr();
+				Machine.emit(Op.CALL, Reg.CB, 0);
+				addToMap((MethodDecl)expr.functionRef.decl, addr2);
+			} else {
+				if (expr.functionRef instanceof QualRef) {
+					QualRef temp = (QualRef) expr.functionRef;
+					encodeFetch(temp.ref);
+				} else {
+					Machine.emit(Op.LOADA, Reg.OB, 0);
+				}
+				
+				int addr2 = Machine.nextInstrAddr();
+				Machine.emit(Op.CALLI, Reg.CB, 0);
+				addToMap((MethodDecl)expr.functionRef.decl, addr2);
+			}
+			
+		}
+
+		
 		return null;
 	}
 
@@ -588,27 +631,31 @@ public class CodeGenerator implements Visitor<Object, Object>{
 	// TODO: Issues with references
 	@Override
 	public Object visitThisRef(ThisRef ref, Object arg) {
-		System.out.println("VISITING THIS REF");
-		Machine.emit(Op.LOAD, Reg.OB, 0);
+		Machine.emit(Op.LOADA, Reg.OB, 0);
 		encodeFetch(ref);
 		return null;
 	}
 	// TODO: Issues with references
 	@Override
 	public Object visitIdRef(IdRef ref, Object arg) {
-		//Frame frame = (Frame) arg;
-		System.out.println("VISITING ID REF");
-		Machine.emit(Op.LOAD, Reg.LB, ref.decl.RED.offset);
+		
+		/* NEW START */
+		if (ref.decl instanceof MemberDecl) {
+			Machine.emit(Op.LOAD, Reg.OB, ref.decl.RED.offset);
+		} else {
+		/* NEW END */
+		// Just commented out
+			Machine.emit(Op.LOAD, Reg.LB, ref.decl.RED.offset);
+		}
 		return null;
 	}
 
 	@Override
 	public Object visitQRef(QualRef ref, Object arg) {
-		System.out.println("IN QUAL REF");
 		
 		if (ref.ref instanceof ThisRef) {
-			System.out.println("===============================================================================");
-			Machine.emit(Op.LOAD, Reg.OB, ref.id.decl.RED.offset);
+			Machine.emit(Op.LOADA, Reg.OB, 0);
+			Machine.emit(Op.LOADL, ref.id.decl.RED.offset);
 			return null;
 		}
 		
@@ -639,8 +686,6 @@ public class CodeGenerator implements Visitor<Object, Object>{
 	
 	@Override
 	public Object visitIdentifier(Identifier id, Object arg) {
-		//System.out.println("IDENTIFIER");
-		//Integer temp = id.decl.RED.offset;
 		Machine.emit(Op.LOADL, id.decl.RED.offset);
 		return null;
 	}
@@ -738,7 +783,6 @@ public class CodeGenerator implements Visitor<Object, Object>{
 		Declaration decl = ref.decl;
 		if (decl instanceof VarDecl || decl instanceof ParameterDecl) {
 			// LocalDecl (DONE)
-			System.out.println("LOCAL");
 			if (ref instanceof IxRef) {
 				ref.visit(this, null);
 				exp.visit(this, null);
@@ -749,8 +793,7 @@ public class CodeGenerator implements Visitor<Object, Object>{
 			}
 		} else {
 			// Member decl
-			//TODO
-			System.out.println("NOT LOCAL");
+			
 			
 			if (ref instanceof QualRef) {
 				ref.visit(this, null);
@@ -763,7 +806,7 @@ public class CodeGenerator implements Visitor<Object, Object>{
 				Machine.emit(Op.STORE, 0, Reg.OB, temp.id.decl.RED.offset);
 			} else if (ref instanceof ThisRef) {
 				ThisRef temp = (ThisRef) ref;
-				Machine.emit(Op.LOAD, Reg.OB, 0);
+				Machine.emit(Op.LOADA, Reg.OB, 0);
 				// do nothing
 			} else if (ref instanceof IxRef) {
 				ref.visit(this, null);
@@ -787,16 +830,15 @@ public class CodeGenerator implements Visitor<Object, Object>{
 				ref.visit(this, null);
 				Machine.emit(Prim.arrayref);
 			} else {
-				System.out.println("LOCAL");
 				Machine.emit(Op.LOAD, Reg.LB, ref.decl.RED.offset);
 			}
 		} else {
-			System.out.println("NOT LOCAL");
 			if (ref instanceof QualRef) {
 				QualRef temp = (QualRef) ref;
 				ref.visit(this, null);
 				if (temp.ref instanceof ThisRef) {
-					Machine.emit(Op.LOAD, Reg.OB, temp.id.decl.RED.offset);
+//					Machine.emit(Op.LOAD, Reg.OB, temp.id.decl.RED.offset);
+					Machine.emit(Prim.fieldref);
 				} else {
 					Machine.emit(Prim.fieldref);
 				}
@@ -804,9 +846,8 @@ public class CodeGenerator implements Visitor<Object, Object>{
 				IdRef temp = (IdRef) ref;
 				Machine.emit(Op.LOAD, 0, Reg.OB, temp.id.decl.RED.offset);
 			} else if (ref instanceof ThisRef) {
-				System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 				ThisRef temp = (ThisRef) ref;
-				Machine.emit(Op.LOAD, Reg.OB, 0);
+				Machine.emit(Op.LOADA, Reg.OB, 0);
 				// do nothing
 			} else if (ref instanceof IxRef) {
 				ref.visit(this, null);

@@ -4,10 +4,14 @@ class Counter {
    	}
 	public static void main(String [] args){ 
 		Counter counter = new Counter();
+		Counter second = new Counter();
 		counter.increase(3);
 		System.out.println(counter.count);
+		System.out.println(second.count);
 		counter.increase(8);
+		second.increase(102);
 		System.out.println(counter.count);
+		System.out.println(second.count);
 	}
 	
 	public int count;
