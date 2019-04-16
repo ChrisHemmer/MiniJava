@@ -54,6 +54,7 @@ class PA4Test
         x = 7 + a.n;
         System.out.println(x);
 		
+		a.n  = 1573;
         a.b = new B();
         
         
@@ -80,12 +81,15 @@ class PA4Test
         x = aa[3] + 4;
         System.out.println(x);
         
-        /*
+        
+        System.out.println(1);
+        System.out.println(2);
+        System.out.println(3);
         a.start();
         
         
         System.out.println(999);
-        */
+        
     }
 }
 
@@ -94,13 +98,18 @@ class A
 {
     int n;
     B b;
-    /*
+    
+    // b was initialized to a new B() in the main method
     public void start(){
+    	//System.out.println(n);
         int x = 11;
         System.out.println(x);
         
         
         b.a = this;
+        System.out.println(4);
+        System.out.println(200);
+        
         n = 12;
         x = b.a.n;
         System.out.println(x);
@@ -127,7 +136,7 @@ class A
     public int goo(A a, B bb) {
         return (a.n + bb.n + this.n);
     }
-    */
+    
 }
 
 
@@ -137,12 +146,12 @@ class B
     int n;
     A a;
     
-    /*
+    
     public int fact(int nn){
         int r = 1;
         if (nn > 1)
             r = nn * fact(nn -1);
         return r;
     }
-    */
+    
 }
