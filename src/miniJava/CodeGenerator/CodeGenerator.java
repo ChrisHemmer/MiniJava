@@ -319,8 +319,6 @@ public class CodeGenerator implements Visitor<Object, Object>{
 	//TODO: CallStmt
 	@Override
 	public Object visitCallStmt(CallStmt stmt, Object arg) {
-		//System.out.println("VISITING CALL STATEMENT");
-		//Frame frame = (Frame) arg;
 		try {
 			QualRef a = (QualRef) stmt.methodRef;
 			QualRef b = (QualRef) a.ref;
@@ -511,13 +509,63 @@ public class CodeGenerator implements Visitor<Object, Object>{
 	public Object visitBinaryExpr(BinaryExpr expr, Object arg) {
 		if (expr.operator.spelling.equals("&&")) {
 			expr.left.visit(this, null);
+			int addr1 = Machine.nextInstrAddr();
+			Machine.emit(Op.JUMPIF, 0, Reg.CB, 0);
+			Machine.emit(Op.LOADL, 1);
+			
+			
 			expr.right.visit(this, null);
-			expr.operator.visit(this, null);
+			expr.operator.visit(this, null); // will put 1 or 0 on the stack top
+			//Machine.emit(Prim.putintnl);
+			int addr3 = Machine.nextInstrAddr();
+			Machine.emit(Op.JUMP, 0, Reg.CB, 0);
+			
+			
+			int shortCircuitAddress = Machine.nextInstrAddr();
+			Machine.emit(Op.LOADL, 0);
+			int addr2 = Machine.nextInstrAddr();
+			Machine.emit(Op.JUMP, Reg.CB, 0);
+			
+			
+			
+			int endAddr = Machine.nextInstrAddr();
+			
+			
+			Machine.patch(addr1, shortCircuitAddress);
+			Machine.patch(addr2, endAddr);
+			Machine.patch(addr3, endAddr);
 		} else if (expr.operator.spelling.equals("||")) {
 			// logic expression, might need to short circuit
 			expr.left.visit(this, null);
+			int addr1 = Machine.nextInstrAddr();
+			Machine.emit(Op.JUMPIF, 1, Reg.CB, 0);
+			Machine.emit(Op.LOADL, 0);
+			
+			
 			expr.right.visit(this, null);
 			expr.operator.visit(this, null);
+			int addr3 = Machine.nextInstrAddr();
+			Machine.emit(Op.JUMP, 0, Reg.CB, 0);
+			
+			
+			int shortCircuitAddress = Machine.nextInstrAddr();
+			Machine.emit(Op.LOADL, 1);
+			int addr2 = Machine.nextInstrAddr();
+			Machine.emit(Op.JUMP, Reg.CB, 0);
+			
+			
+			
+			
+			expr.right.visit(this, null);
+			expr.operator.visit(this, null);
+			
+			
+			
+			
+			int endAddr = Machine.nextInstrAddr();
+			Machine.patch(addr1, shortCircuitAddress);
+			Machine.patch(addr2, endAddr);
+			Machine.patch(addr3, endAddr);
 		} else {
 			expr.left.visit(this, null);
 			expr.right.visit(this, null);

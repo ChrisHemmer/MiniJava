@@ -53,13 +53,15 @@ import miniJava.SyntacticAnalyzer.Scanner;
  */
 public class Compiler {
 
-	static boolean printCommands = false;
+	static boolean printCommands = true;
 	
 	public static void main(String[] args) {
 
 		InputStream inputStream = null;
 		
-		
+		int index = args[0].lastIndexOf(".");
+		String fileName = args[0].substring(0, index);
+		System.out.println(fileName);
 		
 		
 		try {
@@ -73,34 +75,33 @@ public class Compiler {
 		Scanner scanner = new Scanner(inputStream, reporter);
 		Parser parser = new Parser(scanner, reporter);
 
-		println("Syntactic analysis ... ");
+		System.out.println("Syntactic analysis ... ");
 		AST ast = parser.parse();
-		print("Syntactic analysis complete:  ");
+		System.out.print("Syntactic analysis complete:  ");
 		
 		// START: Checking results of parsing
 		if (reporter.hasErrors()) {
-			println("Syntactically Invalid miniJava program");
+			System.out.println("Syntactically Invalid miniJava program");
 			System.exit(4);
 		} else {
-			println("Syntactically Valid miniJava program");
+			System.out.println("Syntactically Valid miniJava program");
 		}
 		// END: Checking results of parsing
 		
-		println(inputStream.toString());
 		
 		
-		println("Contextual analysis ... ");
+		System.out.println("Contextual analysis ... ");
 		
 		
 		// START: Checking results of identification
 		new Identification(ast, reporter);
-		print("Contextual analysis - identification complete: ");
+		System.out.print("Contextual analysis - identification complete: ");
 		if (reporter.hasErrors()) {
-			println("Failed Identification");
+			System.out.println("Failed Identification");
 			System.exit(4);
 		}
 		else {
-			println("Passed Identification");
+			System.out.println("Passed Identification");
 		}
 		
 		// END: Checking results of identification
@@ -111,29 +112,31 @@ public class Compiler {
 		
 		// START: Checking results of Type Checking
 		new TypeChecking(ast, reporter);
-		print("Contextual analysis - type checking complete: ");
+		System.out.print("Contextual analysis - type checking complete: ");
 		if (reporter.hasErrors()) {
-			println("Failed Type Checking");
+			System.out.println("Failed Type Checking");
 			System.exit(4);
 		}
 		else {
-			println("Passed Type Checking");
-			println("Valid miniJava program");
+			System.out.println("Passed Type Checking");
+			System.out.println("Valid miniJava program");
 			//new ASTDisplay().showTree(ast);
 		}
 		new CodeGenerator().encodeRun(ast);
-		new ObjectFile("test.mJAM").write();
+		new ObjectFile(fileName + ".mJAM").write();
 		
 		
-		println("\n\nDisassembling...");
+		
 		
 		if (printCommands) {
-			new Disassembler("test.mJAM").disassemble();
+			println("\n\nDisassembling...");
+			new Disassembler(fileName + ".mJAM").disassemble();
 			println("\n\n\n");
 			println("Running...");
+			Interpreter.interpret(fileName + ".mJAM");
 		}
 		
-		Interpreter.interpret("test.mJAM");
+		
 		// END: Checking results of Type Checking 
 			
 	}

@@ -1,0 +1,119 @@
+class Foo{
+
+	public static void main(String[] args){
+		Bar test = new Bar();
+		
+		if (test.x == null){
+			System.out.println(1);
+		}
+		
+		
+		/*
+		* Testing AND (&&)
+		*/
+		
+		// true && false
+		if (5 == 5 && false){
+			System.out.println(-1);
+		} else{
+			System.out.println(2);
+		}
+		
+		// false && true
+		if (5 < 2 && true){
+			System.out.println(-1);
+		} else{
+			System.out.println(3);
+		}
+		
+		// false && false
+		if (false && false){
+			System.out.println(-1);
+		} else{
+			System.out.println(4);
+		}
+		
+		// true && true
+		if (true && (5*6) == 30){
+			System.out.println(5);
+		} else{
+			System.out.println(-1);
+		}
+		
+		// false && null pointer (should short-circuit)
+		if (false && test.x.x == -5){
+			System.out.println(-1);
+		} else{
+			System.out.println(6);
+		}
+		
+		
+		/*
+		* Testing OR (||)
+		*/
+		
+		// true || false
+		if (true || false){
+			System.out.println(7);
+		} else{
+			System.out.println(-1);
+		}
+		
+		
+		// false || true
+		if (5 == 4 || true){
+			System.out.println(8);
+		} else{
+			System.out.println(-1);
+		}
+		
+		// false || false
+		if (false || false){
+			System.out.println(-1);
+		} else{
+			System.out.println(9);
+		}
+		
+		// true || true
+		if (true || true){
+			System.out.println(10);
+		} else{
+			System.out.println(-1);
+		}	
+		
+		
+		// true || null pointer (should short-circuit)
+		if (true || test.x.x == 5){
+			System.out.println(11);
+		} else{
+			System.out.println(-1);
+		}
+		
+		
+		/*
+		 * Random tests
+		 */
+		boolean x = false && test.x.x == 5;
+		
+		if ((((false && test.x.x == 5) || true) || test.x.x == 10) && true){
+			System.out.println(12);
+		} else{
+			System.out.println(-1);
+		}
+		
+		
+		
+	}
+
+}
+
+
+class Bar{
+	Help x;
+
+
+}
+
+class Help{
+	int x;
+}
