@@ -224,9 +224,7 @@ public class Identification implements Visitor<Object, Object>{
 		
 		stmt.varDecl.visit(this, null);
 		table.disallowAccess(stmt.varDecl.name);
-		if (stmt.initExp instanceof NewArrayExpr) {
-			System.out.println("Oh boy its a new array expression");
-		}
+		
 		stmt.initExp.visit(this, null);
 		table.allowAccess();
 		
@@ -237,9 +235,7 @@ public class Identification implements Visitor<Object, Object>{
 	@Override
 	public Object visitAssignStmt(AssignStmt stmt, Object arg) {
 		
-		if (stmt.val instanceof NewArrayExpr) {
-			System.out.println("Oh girl its a new array expression");
-		}
+		
 		stmt.val.visit(this, null);
 		
 		stmt.ref.visit(this, null);

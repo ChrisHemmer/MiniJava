@@ -53,10 +53,15 @@ import miniJava.SyntacticAnalyzer.Scanner;
  */
 public class Compiler {
 
+	static boolean printCommands = false;
+	
 	public static void main(String[] args) {
 
 		InputStream inputStream = null;
-	
+		
+		
+		
+		
 		try {
 			inputStream = new FileInputStream(args[0]);
 		} catch (FileNotFoundException e) {
@@ -68,34 +73,34 @@ public class Compiler {
 		Scanner scanner = new Scanner(inputStream, reporter);
 		Parser parser = new Parser(scanner, reporter);
 
-		System.out.println("Syntactic analysis ... ");
+		println("Syntactic analysis ... ");
 		AST ast = parser.parse();
-		System.out.print("Syntactic analysis complete:  ");
+		print("Syntactic analysis complete:  ");
 		
 		// START: Checking results of parsing
 		if (reporter.hasErrors()) {
-			System.out.println("Syntactically Invalid miniJava program");
+			println("Syntactically Invalid miniJava program");
 			System.exit(4);
 		} else {
-			System.out.println("Syntactically Valid miniJava program");
+			println("Syntactically Valid miniJava program");
 		}
 		// END: Checking results of parsing
 		
-		System.out.println(inputStream.toString());
+		println(inputStream.toString());
 		
 		
-		System.out.println("Contextual analysis ... ");
+		println("Contextual analysis ... ");
 		
 		
 		// START: Checking results of identification
 		new Identification(ast, reporter);
-		System.out.print("Contextual analysis - identification complete: ");
+		print("Contextual analysis - identification complete: ");
 		if (reporter.hasErrors()) {
-			System.out.println("Failed Identification");
+			println("Failed Identification");
 			System.exit(4);
 		}
 		else {
-			System.out.println("Passed Identification");
+			println("Passed Identification");
 		}
 		
 		// END: Checking results of identification
@@ -106,27 +111,40 @@ public class Compiler {
 		
 		// START: Checking results of Type Checking
 		new TypeChecking(ast, reporter);
-		System.out.print("Contextual analysis - type checking complete: ");
+		print("Contextual analysis - type checking complete: ");
 		if (reporter.hasErrors()) {
-			System.out.println("Failed Type Checking");
+			println("Failed Type Checking");
 			System.exit(4);
 		}
 		else {
-			System.out.println("Passed Type Checking");
-			System.out.println("Valid miniJava program");
-			new ASTDisplay().showTree(ast);
+			println("Passed Type Checking");
+			println("Valid miniJava program");
+			//new ASTDisplay().showTree(ast);
 		}
 		new CodeGenerator().encodeRun(ast);
 		new ObjectFile("test.mJAM").write();
-		System.out.println("\n\nDisassembling...");
-		new Disassembler("test.mJAM").disassemble();
-		System.out.println("\n\n\n");
-		System.out.println("Running...");
+		
+		
+		println("\n\nDisassembling...");
+		//new Disassembler("test.mJAM").disassemble();
+		println("\n\n\n");
+		println("Running...");
+		
 		Interpreter.interpret("test.mJAM");
 		// END: Checking results of Type Checking 
-		
-		
-		
+			
+	}
+	
+	public static void println(String str) {
+		if (printCommands) {
+			System.out.println(str);
+		}
+	}
+	
+	public static void print(String str) {
+		if (printCommands) {
+			System.out.print(str);
+		}
 	}
 }
 

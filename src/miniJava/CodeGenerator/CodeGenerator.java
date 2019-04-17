@@ -71,6 +71,7 @@ public class CodeGenerator implements Visitor<Object, Object>{
 	
 	public int varDeclOffset = 0;
 	public int parameterDeclOffset = 0;
+	public int staticBaseOffset = 0;
 	public MethodDecl currMethod;
 	
 	public int popSize = 0;
@@ -145,27 +146,35 @@ public class CodeGenerator implements Visitor<Object, Object>{
 			fd.RED.offset = count;
 			count += 1;
 		}
+		
+		for (FieldDecl fd: cd.fieldDeclList) {
+			if (fd.isStatic) {
+				fd.visit(this, null);
+				fd.RED.offset = staticBaseOffset;
+				staticBaseOffset += 1;
+			}
+		}
 	}
 	
 	@Override
 	public Object visitClassDecl(ClassDecl cd, Object arg) {
 		
-		/*
+		
 		// static fields
-		for (FieldDecl fd: cd.fieldDeclList) {
-			if (!fd.isStatic) {
-				continue;
-			}
-			
-			fd.visit(this, null);
-		}
-		*/
+//		for (FieldDecl fd: cd.fieldDeclList) {
+//			if (fd.isStatic) {
+//				fd.visit(this, null);
+//				fd.RED.offset = staticBaseOffset;
+//				staticBaseOffset += 1;
+//			}
+//		}
+		
 		
 		for (MethodDecl md: cd.methodDeclList) {
 			md.visit(this, null);
 		}
 		
-		REDPrinter.printClassDecl(cd);
+		//REDPrinter.printClassDecl(cd);
 		return null;
 	}
 
