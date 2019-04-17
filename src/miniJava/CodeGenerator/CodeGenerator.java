@@ -319,6 +319,7 @@ public class CodeGenerator implements Visitor<Object, Object>{
 	//TODO: CallStmt
 	@Override
 	public Object visitCallStmt(CallStmt stmt, Object arg) {
+		System.out.println("VISITING CALL STATEMENT");
 		//Frame frame = (Frame) arg;
 		try {
 			QualRef a = (QualRef) stmt.methodRef;
@@ -327,9 +328,11 @@ public class CodeGenerator implements Visitor<Object, Object>{
 			if (a.id.spelling.equals("println") && b.id.spelling.equals("out") && c.id.spelling.equals("System")){
 				stmt.argList.get(0).visit(this, null);
 				Machine.emit(Prim.putintnl);
+				return null;
 			}
-			return null;
+			
 		} catch (ClassCastException e) {
+			
 		}
 		
 		MethodDecl md = (MethodDecl) stmt.methodRef.decl;
@@ -349,7 +352,6 @@ public class CodeGenerator implements Visitor<Object, Object>{
 				} else {
 					Machine.emit(Op.LOAD, Reg.OB, 0);
 				}
-				
 				
 				
 				
@@ -678,16 +680,13 @@ public class CodeGenerator implements Visitor<Object, Object>{
 			Machine.emit(Op.LOADA, Reg.OB, 0);
 			Machine.emit(Op.LOADL, ref.id.decl.RED.offset);
 			return null;
+		} else if (ref.ref.decl instanceof ClassDecl) {
+			// static references
+			Machine.emit(Op.LOADA, Reg.SB, 0/*ref.id.decl.RED.offset*/);
+			Machine.emit(Op.LOADL, ref.id.decl.RED.offset);
+			return null;
 		}
 		
-		//new
-		if (ref.id.decl instanceof MemberDecl) {
-			MemberDecl temp = (MemberDecl) ref.id.decl;
-			if (temp.isStatic) {
-				Machine.emit(Op.LOAD, Reg.SB, temp.RED.offset);
-				return null;
-			}
-		}
 		
 		
 		
@@ -827,12 +826,13 @@ public class CodeGenerator implements Visitor<Object, Object>{
 			
 			if (ref instanceof QualRef) {
 				QualRef temp = (QualRef) ref;
-				ref.visit(this, null);
-				exp.visit(this, null);
-				MemberDecl md = (MemberDecl) temp.id.decl;
-				if (md.isStatic) {
-					Machine.emit(Op.STORE, Reg.SB, md.RED.offset);
-				}else {
+				if (temp.ref.decl instanceof ClassDecl) {
+					exp.visit(this, null);
+					Machine.emit(Op.STORE, 0, Reg.SB, temp.id.decl.RED.offset);
+				} else {
+					ref.visit(this, null);
+					exp.visit(this, null);
+				
 					Machine.emit(Prim.fieldupd);
 				}
 			} else if (ref instanceof IdRef) {
@@ -876,14 +876,14 @@ public class CodeGenerator implements Visitor<Object, Object>{
 		} else {
 			if (ref instanceof QualRef) {
 				QualRef temp = (QualRef) ref;
-				ref.visit(this, null);
-				
-				if (temp.decl instanceof MemberDecl) {
-					MemberDecl md = (MemberDecl) temp.decl;
-					if (md.isStatic) {
-						return;
-					}
+				// The temp.ref instanceof thing is weird
+				if (temp.ref.decl instanceof ClassDecl && !(temp.ref instanceof ThisRef)) {
+					Machine.emit(Op.LOAD, 0, Reg.SB, temp.id.decl.RED.offset);
+					return;
 				}
+				
+				ref.visit(this, null);
+
 				
 				
 				if (temp.ref instanceof ThisRef) {

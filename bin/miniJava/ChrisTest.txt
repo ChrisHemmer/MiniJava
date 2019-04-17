@@ -1,32 +1,41 @@
 class Counter {
 
+	public static Counter globalCounter;
+
 	public static int totalCount;
 	
 	public int count;
 	
 	public void increase(int x){
-		//System.out.println(totalCount);
+		if (x == 0){
+			System.out.println(count);
+		}
 		count = count + x;
 		totalCount = totalCount + x;
-		//System.out.println(totalCount);
+
 		
 	}
 
 	
 	public static void main(String[] args){
+	
 		Counter a = new Counter();
 		a.increase(15);
 		
 		Counter b = new Counter();
 		b.increase(12);
-		
-		
-		System.out.println(a.count);
-		System.out.println(b.count);
+
 		System.out.println(Counter.totalCount);
-		Counter.totalCount = Counter.totalCount + 100;
+		Counter.totalCount = Counter.totalCount * 2 + 4;
 		System.out.println(Counter.totalCount);
 		
+		
+		Counter.globalCounter = new Counter();
+		System.out.println(Counter.totalCount);
+		Counter.globalCounter.increase(12);
+		Counter.globalCounter.increase(0);
+		System.out.println(0);
+		System.out.println(Counter.globalCounter.count);
 		
 	}
 
