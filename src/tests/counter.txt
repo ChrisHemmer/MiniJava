@@ -1,0 +1,63 @@
+class Counter {
+
+	public static int numberOfCounters;
+	public static int totalCount;
+	public int count;
+	
+
+    public void increase(int k) {
+		count = count + k;
+		totalCount = totalCount + k;
+    }
+    
+    public void initCounter(){
+    	numberOfCounters = numberOfCounters + 1;
+    }
+
+}
+
+
+class Driver{
+	public static void main(String[]args){
+		Counter[] counters = new Counter[3];
+		
+		Counter a = new Counter();
+		a.initCounter();
+		Counter b = new Counter();
+		b.initCounter();
+		Counter c = new Counter();
+		c.initCounter();
+		
+		counters[0] = a;
+		counters[1] = b;
+		counters[2] = c;
+		
+		printCounters(counters);
+		
+		
+		a.increase(5);
+		b.increase(10);
+		c.increase(15);
+		
+		printCounters(counters);
+		
+		a.increase(2);
+		b.increase(-5);
+		c.increase(5 + 3 * 4 / 6 * Counter.totalCount);
+		
+		printCounters(counters);
+		
+	}
+	
+	public static void printCounters(Counter[] x){
+		int i = 0;
+		while (i < x.length){
+			Counter temp = x[i];
+			System.out.println(temp.count);
+			i = i + 1;
+		}
+		
+		System.out.println(Counter.totalCount);
+	}
+
+}

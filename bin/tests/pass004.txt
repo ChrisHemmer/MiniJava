@@ -1,0 +1,46 @@
+class Foo{
+
+	public static void main(String[] args){
+		Node head = new Node();
+		head.value = 0;
+		
+		int i = 2;
+		while (i < 50){
+			Node x = new Node();
+			x.value = i;
+			head.add(x);
+			i = i * 2;
+		}
+		
+		head.print();
+		
+		System.out.println(head.next.next.next.next.next.next.value + 1000);
+	}
+
+}
+
+
+
+class Node{
+	int value;
+	Node next;
+	
+	public void add(Node x){
+		if (next == null){
+			this.next = x;
+			Node temp = new Node();
+			temp.value = x.value +4;
+			next.next = temp;
+		} else{
+			next.add(x);
+			
+		}
+	}
+	
+	public void print(){
+		System.out.println(this.value);
+		if (next != null){
+			next.print();
+		}
+	}
+}

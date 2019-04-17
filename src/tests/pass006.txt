@@ -1,0 +1,67 @@
+class Foo{
+
+	public static void main(String[] args){
+		Loop x = new Loop();
+		x.start = 0;
+		x.end = 100;
+		Loop.bannedNumbers = new int[5];
+		Loop.bannedNumbers[0] = 13;
+		Loop.bannedNumbers[1] = 33;
+		Loop.bannedNumbers[2] = 53;
+		Loop.bannedNumbers[3] = 73;
+		Loop.bannedNumbers[4] = 93;
+		x.loop();
+		
+		Loop.bannedNumbers = new int[95];
+		int i = 0;
+		while (i < Loop.bannedNumbers.length){
+			Loop.bannedNumbers[i] = i;
+			i = i + 1;
+		}
+		System.out.println(100000);
+		x.loop();
+	}
+
+	
+}
+
+class Loop{
+	int start;
+	int end;
+	
+	public static int[] bannedNumbers;
+
+	public void loop(){
+		int tens = 0;
+		
+		while (tens < end/10){
+			int ones = 0;
+			while (ones < 10){
+				int result = tens * 10 + ones;
+				if ( ! ArrayHelper.contains(bannedNumbers, result)){
+					System.out.println(result);
+				}
+				ones = ones + 1;
+			}
+			tens = tens + 1;
+		}
+		
+	
+	}
+
+}
+
+class ArrayHelper{
+	public static boolean contains(int[] arr, int elm){
+		int i = 0;
+		while (i < arr.length){
+			if (arr[i] == elm){
+				return true;
+			}
+			i = i + 1;
+		}
+		
+		return false;
+	}
+
+}

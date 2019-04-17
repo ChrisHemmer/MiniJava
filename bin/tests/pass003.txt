@@ -1,0 +1,49 @@
+class Foo{
+
+	public static void print(int[] arr){
+		int i = 0;
+		while (i < arr.length){
+			System.out.println(arr[i]);
+			i = i + 1;
+		} 
+	
+	}
+	
+	public static void flipLoop(int[] arr){
+		int i = 0;
+		while (i < arr.length / 2){
+			int temp = arr[i];
+			arr[i] = arr[arr.length-1-i];
+			arr[arr.length-1-i] = temp;
+			i = i + 1;
+		}
+	}
+	
+	
+	public static void main(String[] args){
+		int[] values = new int[10];
+		
+		int i = 0;
+		while (i < values.length){
+			values[i] = i;
+			i = i + 1;
+		} 
+		print(values);
+		flipLoop(values);
+		System.out.println(100);
+		printZeros(values);
+		System.out.println(100);
+		print(values);
+	}
+	
+	public static void printZeros(int[] arr){
+		int i = 2;
+		while (arr[i] != 0){
+			i = i + 1;
+		}
+		
+		System.out.println(arr[i]);
+		System.out.println(arr[i]);
+		System.out.println(arr[i]);	
+	}
+}

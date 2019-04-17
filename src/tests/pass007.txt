@@ -1,0 +1,26 @@
+class Foo{
+
+	public static void main(String[] args){
+		int[] x = new int[5];
+		System.out.println(x.length);
+		Bar b = new Bar();
+		b.c = new Charlie();
+		b.array = new int[10];
+		b.c.array = new int[20];
+		System.out.println(b.array.length);
+		System.out.println(b.c.array.length);
+		
+	}
+
+	
+}
+
+class Bar{
+	int[] array;
+	Charlie c;
+}
+
+class Charlie{
+	int[] array;
+
+}

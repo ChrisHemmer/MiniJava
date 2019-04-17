@@ -1,0 +1,65 @@
+class Foo{
+	public static void main(String[] args){
+		Bar b = new Bar();
+		b.z = new Zed();
+		b.z.w = new Wow();
+		
+		System.out.println(b.z.w.x);
+		Wow temp = b.z.w;
+		b.z.w.x = 1;
+		System.out.println(temp.x);
+		temp.x = 2;
+		
+		System.out.println(b.z.w.x);
+		
+		if (Bar.generateBoolean()){
+			Zed tempp = new Zed();
+			tempp.y = 4;
+			System.out.println(Bar.generateInt(tempp));
+		}
+		recursiveIterativeCountUp(5);
+		countTo250(17);
+		
+	}
+	
+	public static void recursiveIterativeCountUp(int start){
+		if (start > 15){
+			return;
+		}
+		int i = start;
+		while (i < start + 3){
+			System.out.println(i);
+			i = i + 1;
+		}
+		recursiveIterativeCountUp(i);
+	}
+	
+	public static void countTo250(int start){
+		System.out.println(start);
+		if (start != 250){
+			countTo250(start + 1);
+		}
+	}
+}
+
+class Bar{
+	Zed z;
+	
+	public static boolean generateBoolean(){
+		System.out.println(3);
+		return true;
+	}
+	
+	public static int generateInt(Zed z){
+		return z.y;
+	}
+}
+
+class Zed{
+	Wow w;
+	int y;
+}
+
+class Wow{
+	int x;
+}

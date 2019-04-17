@@ -1,0 +1,46 @@
+class Foo{
+
+	public static void main(String[] args){
+		Bar x = new Bar();
+		x.x = 0;
+		Bar y = new Bar();
+		y.x = 1;
+		printBars1(x, y);
+	}
+
+	public static void printBars1(Bar a, Bar b){
+		System.out.println(0);
+		System.out.println(a.x);
+		System.out.println(1);
+		System.out.println(b.x);
+		
+		a.x = 3;
+		b.x = 2;
+		printBars2(b, a);
+	}
+	
+	public static void printBars2(Bar a, Bar b){
+		System.out.println(2);
+		System.out.println(a.x);
+		System.out.println(3);
+		System.out.println(b.x);
+		
+		a.x = 5;
+		b.x = 4;
+		printBars3(b, a);
+	}
+	
+	public static void printBars3(Bar a, Bar b){
+		System.out.println(4);
+		System.out.println(a.x);
+		System.out.println(5);
+		System.out.println(b.x);
+	}
+	
+}
+
+class Bar{
+	int x;
+	Bar nested;
+
+}

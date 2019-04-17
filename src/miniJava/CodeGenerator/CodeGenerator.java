@@ -319,7 +319,7 @@ public class CodeGenerator implements Visitor<Object, Object>{
 	//TODO: CallStmt
 	@Override
 	public Object visitCallStmt(CallStmt stmt, Object arg) {
-		System.out.println("VISITING CALL STATEMENT");
+		//System.out.println("VISITING CALL STATEMENT");
 		//Frame frame = (Frame) arg;
 		try {
 			QualRef a = (QualRef) stmt.methodRef;
@@ -509,9 +509,20 @@ public class CodeGenerator implements Visitor<Object, Object>{
 
 	@Override
 	public Object visitBinaryExpr(BinaryExpr expr, Object arg) {
-		expr.left.visit(this, null);
-		expr.right.visit(this, null);
-		expr.operator.visit(this, null);
+		if (expr.operator.spelling.equals("&&")) {
+			expr.left.visit(this, null);
+			expr.right.visit(this, null);
+			expr.operator.visit(this, null);
+		} else if (expr.operator.spelling.equals("||")) {
+			// logic expression, might need to short circuit
+			expr.left.visit(this, null);
+			expr.right.visit(this, null);
+			expr.operator.visit(this, null);
+		} else {
+			expr.left.visit(this, null);
+			expr.right.visit(this, null);
+			expr.operator.visit(this, null);
+		}
 		return null;
 	}
 
@@ -726,10 +737,6 @@ public class CodeGenerator implements Visitor<Object, Object>{
 		if (arg instanceof String && arg.equals("unary")) {
 			if (x.equals("!")) {
 				Machine.emit(Prim.not);
-			} else if (x.equals("||")) {
-				Machine.emit(Prim.or);
-			} else if (x.equals("&&")) {
-				Machine.emit(Prim.and);
 			} else if (x.equals("-")) {
 				Machine.emit(Prim.neg);
 			}
@@ -761,7 +768,11 @@ public class CodeGenerator implements Visitor<Object, Object>{
 			Machine.emit(Prim.eq);
 		} else if (x.equals("!=")) {
 			Machine.emit(Prim.ne);
-		}
+		}  else if (x.equals("||")) {
+			Machine.emit(Prim.or);
+		} else if (x.equals("&&")) {
+			Machine.emit(Prim.and);
+		} 
 		return null;
 	}
 
@@ -826,9 +837,14 @@ public class CodeGenerator implements Visitor<Object, Object>{
 			
 			if (ref instanceof QualRef) {
 				QualRef temp = (QualRef) ref;
-				if (temp.ref.decl instanceof ClassDecl) {
+				if (temp.ref.decl instanceof ClassDecl && !(temp.ref instanceof ThisRef)) {
 					exp.visit(this, null);
 					Machine.emit(Op.STORE, 0, Reg.SB, temp.id.decl.RED.offset);
+				} else if (temp.ref instanceof ThisRef) {
+					//System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++");
+					//ref.visit(this, null);
+					exp.visit(this, null);
+					Machine.emit(Op.STORE, 0, Reg.OB, temp.id.decl.RED.offset);
 				} else {
 					ref.visit(this, null);
 					exp.visit(this, null);
