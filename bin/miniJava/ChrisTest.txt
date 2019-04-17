@@ -1,13 +1,45 @@
 class Counter {
 
+	public static int totalCount;
+	
+	public int count;
+	
+	public void increase(int x){
+		//System.out.println(totalCount);
+		count = count + x;
+		totalCount = totalCount + x;
+		//System.out.println(totalCount);
+		
+	}
 
-    public static void main(String [] args){
-		printCheck(5, 100);
-    }
-
-    public static void printCheck(int a, int b){
-    	System.out.println(a);
-    	System.out.println(b);
-    }
+	
+	public static void main(String[] args){
+		Counter a = new Counter();
+		a.increase(15);
+		
+		Counter b = new Counter();
+		b.increase(12);
+		
+		
+		System.out.println(a.count);
+		System.out.println(b.count);
+		System.out.println(Counter.totalCount);
+		Counter.totalCount = Counter.totalCount + 100;
+		System.out.println(Counter.totalCount);
+		
+		
+	}
 
 }
+
+/*
+types of static references
+
+
+1. In a class, a simple IdRef to a static field of the class (as seen above)
+2. If class A has a static field x, A.x
+
+
+
+
+*/

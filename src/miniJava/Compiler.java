@@ -53,7 +53,7 @@ import miniJava.SyntacticAnalyzer.Scanner;
  */
 public class Compiler {
 
-	static boolean printCommands = false;
+	static boolean printCommands = true;
 	
 	public static void main(String[] args) {
 
@@ -126,9 +126,12 @@ public class Compiler {
 		
 		
 		println("\n\nDisassembling...");
-		//new Disassembler("test.mJAM").disassemble();
-		println("\n\n\n");
-		println("Running...");
+		
+		if (printCommands) {
+			new Disassembler("test.mJAM").disassemble();
+			println("\n\n\n");
+			println("Running...");
+		}
 		
 		Interpreter.interpret("test.mJAM");
 		// END: Checking results of Type Checking 

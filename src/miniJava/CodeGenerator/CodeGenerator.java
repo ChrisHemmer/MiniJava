@@ -110,6 +110,24 @@ public class CodeGenerator implements Visitor<Object, Object>{
 		
 		backPatchMap = new HashMap<MethodDecl, List<Integer>>();
 		
+		/* Pre-preamble*/
+		for (ClassDecl cd: prog.classDeclList) {
+			for (FieldDecl fd: cd.fieldDeclList) {
+				if (fd.isStatic) {
+					fd.visit(this, null);
+					fd.RED.offset = staticBaseOffset;
+					staticBaseOffset += 1;
+					Machine.emit(Op.PUSH, Reg.SB, 1);
+					Machine.emit(Op.LOADL, 0);
+					Machine.emit(Op.STORE, 0, Reg.SB, fd.RED.offset);
+				}
+			}
+		}
+		
+		
+		
+		
+		
 		/* Preamble */
 		Machine.emit(Op.LOADL, 0);
 		Machine.emit(Prim.newarr);
@@ -147,13 +165,7 @@ public class CodeGenerator implements Visitor<Object, Object>{
 			count += 1;
 		}
 		
-		for (FieldDecl fd: cd.fieldDeclList) {
-			if (fd.isStatic) {
-				fd.visit(this, null);
-				fd.RED.offset = staticBaseOffset;
-				staticBaseOffset += 1;
-			}
-		}
+		
 	}
 	
 	@Override
@@ -649,7 +661,7 @@ public class CodeGenerator implements Visitor<Object, Object>{
 	public Object visitIdRef(IdRef ref, Object arg) {
 		
 		/* NEW START */
-		if (ref.decl instanceof MemberDecl) {
+		if (ref.decl instanceof MemberDecl) {	
 			Machine.emit(Op.LOAD, Reg.OB, ref.decl.RED.offset);
 		} else {
 		/* NEW END */
@@ -666,6 +678,15 @@ public class CodeGenerator implements Visitor<Object, Object>{
 			Machine.emit(Op.LOADA, Reg.OB, 0);
 			Machine.emit(Op.LOADL, ref.id.decl.RED.offset);
 			return null;
+		}
+		
+		//new
+		if (ref.id.decl instanceof MemberDecl) {
+			MemberDecl temp = (MemberDecl) ref.id.decl;
+			if (temp.isStatic) {
+				Machine.emit(Op.LOAD, Reg.SB, temp.RED.offset);
+				return null;
+			}
 		}
 		
 		
@@ -805,16 +826,27 @@ public class CodeGenerator implements Visitor<Object, Object>{
 			
 			
 			if (ref instanceof QualRef) {
+				QualRef temp = (QualRef) ref;
 				ref.visit(this, null);
 				exp.visit(this, null);
-				Machine.emit(Prim.fieldupd);
+				MemberDecl md = (MemberDecl) temp.id.decl;
+				if (md.isStatic) {
+					Machine.emit(Op.STORE, Reg.SB, md.RED.offset);
+				}else {
+					Machine.emit(Prim.fieldupd);
+				}
 			} else if (ref instanceof IdRef) {
 				// Only here for instance fields
 				IdRef temp = (IdRef) ref;
+				MemberDecl md = (MemberDecl) temp.decl;
 				exp.visit(this, null);
-				Machine.emit(Op.STORE, 0, Reg.OB, temp.id.decl.RED.offset);
+				if (md.isStatic) {
+					Machine.emit(Op.STORE, 0, Reg.SB, temp.id.decl.RED.offset);
+				} else {
+					Machine.emit(Op.STORE, 0, Reg.OB, temp.id.decl.RED.offset);
+				}
 			} else if (ref instanceof ThisRef) {
-				ThisRef temp = (ThisRef) ref;
+				//ThisRef temp = (ThisRef) ref;
 				Machine.emit(Op.LOADA, Reg.OB, 0);
 				// do nothing
 			} else if (ref instanceof IxRef) {
@@ -845,6 +877,15 @@ public class CodeGenerator implements Visitor<Object, Object>{
 			if (ref instanceof QualRef) {
 				QualRef temp = (QualRef) ref;
 				ref.visit(this, null);
+				
+				if (temp.decl instanceof MemberDecl) {
+					MemberDecl md = (MemberDecl) temp.decl;
+					if (md.isStatic) {
+						return;
+					}
+				}
+				
+				
 				if (temp.ref instanceof ThisRef) {
 //					Machine.emit(Op.LOAD, Reg.OB, temp.id.decl.RED.offset);
 					Machine.emit(Prim.fieldref);
@@ -853,7 +894,13 @@ public class CodeGenerator implements Visitor<Object, Object>{
 				}
 			} else if (ref instanceof IdRef) {
 				IdRef temp = (IdRef) ref;
-				Machine.emit(Op.LOAD, 0, Reg.OB, temp.id.decl.RED.offset);
+				MemberDecl md = (MemberDecl) temp.decl;
+				
+				if (md.isStatic) {
+					Machine.emit(Op.LOAD, 0, Reg.SB, temp.id.decl.RED.offset);
+				} else {
+					Machine.emit(Op.LOAD, 0, Reg.OB, temp.id.decl.RED.offset);
+				}
 			} else if (ref instanceof ThisRef) {
 				ThisRef temp = (ThisRef) ref;
 				Machine.emit(Op.LOADA, Reg.OB, 0);
