@@ -341,7 +341,7 @@ public class CodeGenerator implements Visitor<Object, Object>{
 				stmt.argList.get(x).visit(this, null);
 			}
 			if (md.isStatic) {
-				Machine.emit(Op.CALL, stmt.methodRef.decl.RED.offset);
+				Machine.emit(Op.CALL, Reg.CB, stmt.methodRef.decl.RED.offset);
 			} else {
 				
 				

@@ -1,10 +1,10 @@
   0         LOADL        0
   1         CALL         newarr  
-  2         CALL         L14
+  2         CALL         L16
   3         HALT   (0)   
-  4         LOADL        0
-  5         JUMP         L11
-  6  L10:   LOAD         -1[LB]
+  4  L10:   LOADL        0
+  5         JUMP         L12
+  6  L11:   LOAD         -1[LB]
   7         LOAD         3[LB]
   8         CALL         arrayref
   9         CALL         putintnl
@@ -13,15 +13,15 @@
  12         CALL         add     
  13         STORE        3[LB]
  14         POP          0
- 15  L11:   LOAD         3[LB]
+ 15  L12:   LOAD         3[LB]
  16         LOAD         -1[LB]
  17         CALL         arraylen
  18         CALL         lt      
- 19         JUMPIF (1)   L10
+ 19         JUMPIF (1)   L11
  20         RETURN (0)   1
- 21         LOADL        0
- 22         JUMP         L13
- 23  L12:   LOAD         -1[LB]
+ 21  L13:   LOADL        0
+ 22         JUMP         L15
+ 23  L14:   LOAD         -1[LB]
  24         LOAD         3[LB]
  25         CALL         arrayref
  26         LOAD         -1[LB]
@@ -49,19 +49,19 @@
  48         CALL         add     
  49         STORE        3[LB]
  50         POP          1
- 51  L13:   LOAD         3[LB]
+ 51  L15:   LOAD         3[LB]
  52         LOAD         -1[LB]
  53         CALL         arraylen
  54         LOADL        2
  55         CALL         div     
  56         CALL         lt      
- 57         JUMPIF (1)   L12
+ 57         JUMPIF (1)   L14
  58         RETURN (0)   1
- 59  L14:   LOADL        10
+ 59  L16:   LOADL        10
  60         CALL         newarr  
  61         LOADL        0
- 62         JUMP         L16
- 63  L15:   LOAD         3[LB]
+ 62         JUMP         L18
+ 63  L17:   LOAD         3[LB]
  64         LOAD         4[LB]
  65         LOAD         4[LB]
  66         CALL         arrayupd
@@ -70,37 +70,37 @@
  69         CALL         add     
  70         STORE        4[LB]
  71         POP          0
- 72  L16:   LOAD         4[LB]
+ 72  L18:   LOAD         4[LB]
  73         LOAD         3[LB]
  74         CALL         arraylen
  75         CALL         lt      
- 76         JUMPIF (1)   L15
+ 76         JUMPIF (1)   L17
  77         LOAD         3[LB]
- 78         CALL         ***
+ 78         CALL         L10
  79         LOAD         3[LB]
- 80         CALL         ***
+ 80         CALL         L13
  81         LOADL        100
  82         CALL         putintnl
  83         LOAD         3[LB]
- 84         CALL         L17
+ 84         CALL         L19
  85         LOADL        100
  86         CALL         putintnl
  87         LOAD         3[LB]
- 88         CALL         ***
+ 88         CALL         L10
  89         RETURN (0)   1
- 90  L17:   LOADL        2
- 91         JUMP         L19
- 92  L18:   LOAD         3[LB]
+ 90  L19:   LOADL        2
+ 91         JUMP         L21
+ 92  L20:   LOAD         3[LB]
  93         LOADL        1
  94         CALL         add     
  95         STORE        3[LB]
  96         POP          0
- 97  L19:   LOAD         -1[LB]
+ 97  L21:   LOAD         -1[LB]
  98         LOAD         3[LB]
  99         CALL         arrayref
 100         LOADL        0
 101         CALL         ne      
-102         JUMPIF (1)   L18
+102         JUMPIF (1)   L20
 103         LOAD         -1[LB]
 104         LOAD         3[LB]
 105         CALL         arrayref
