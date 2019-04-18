@@ -59,13 +59,15 @@ public class Compiler {
 
 		InputStream inputStream = null;
 		
-		int index = args[0].lastIndexOf(".");
-		String fileName = args[0].substring(0, index);
-		System.out.println(fileName);
+		
+		String fileName = "Default";
+		
 		
 		
 		try {
 			inputStream = new FileInputStream(args[0]);
+			int index = args[0].lastIndexOf(".");
+			fileName = args[0].substring(0, index);
 		} catch (FileNotFoundException e) {
 			System.out.println("Input file " + args[0] + " not found");
 			System.exit(3);

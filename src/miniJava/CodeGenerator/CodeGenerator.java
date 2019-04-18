@@ -36,6 +36,7 @@ import miniJava.AbstractSyntaxTrees.ReturnStmt;
 import miniJava.AbstractSyntaxTrees.Statement;
 import miniJava.AbstractSyntaxTrees.ThisRef;
 import miniJava.AbstractSyntaxTrees.TypeDenoter;
+import miniJava.AbstractSyntaxTrees.TypeKind;
 import miniJava.AbstractSyntaxTrees.UnaryExpr;
 import miniJava.AbstractSyntaxTrees.VarDecl;
 import miniJava.AbstractSyntaxTrees.VarDeclStmt;
@@ -324,7 +325,13 @@ public class CodeGenerator implements Visitor<Object, Object>{
 			QualRef a = (QualRef) stmt.methodRef;
 			QualRef b = (QualRef) a.ref;
 			IdRef c = (IdRef) b.ref;
-			if (a.id.spelling.equals("println") && b.id.spelling.equals("out") && c.id.spelling.equals("System")){
+			
+			ClassType aRefType = (ClassType) a.ref.decl.type;
+			ClassType bRefType = (ClassType) b.ref.decl.type;
+			
+			System.out.println(aRefType.className.spelling);
+			//System.out.println(bRefType.className.spelling);
+			if (aRefType.className.spelling.equals("_PrintStream") && a.id.spelling.equals("println") && b.id.spelling.equals("out") && c.id.spelling.equals("System")){
 				stmt.argList.get(0).visit(this, null);
 				Machine.emit(Prim.putintnl);
 				return null;
@@ -342,6 +349,7 @@ public class CodeGenerator implements Visitor<Object, Object>{
 			}
 			if (md.isStatic) {
 				Machine.emit(Op.CALL, Reg.CB, stmt.methodRef.decl.RED.offset);
+				popMethodReturn(md);
 			} else {
 				
 				
@@ -365,6 +373,8 @@ public class CodeGenerator implements Visitor<Object, Object>{
 				
 				
 				Machine.emit(Op.CALLI, Reg.CB, stmt.methodRef.decl.RED.offset);
+				popMethodReturn(md);
+				System.out.println(md.type);
 			}
 		} else {
 			for (int x = stmt.argList.size() - 1; x >= 0; x--) {
@@ -374,6 +384,7 @@ public class CodeGenerator implements Visitor<Object, Object>{
 				int addr2 = Machine.nextInstrAddr();
 				Machine.emit(Op.CALL, Reg.CB, 0);
 				addToMap((MethodDecl)stmt.methodRef.decl, addr2);
+				popMethodReturn(md);
 			} else {
 				if (stmt.methodRef instanceof QualRef) {
 					QualRef temp = (QualRef) stmt.methodRef;
@@ -385,12 +396,24 @@ public class CodeGenerator implements Visitor<Object, Object>{
 				int addr2 = Machine.nextInstrAddr();
 				Machine.emit(Op.CALLI, Reg.CB, 0);
 				addToMap((MethodDecl)stmt.methodRef.decl, addr2);
+				
+				popMethodReturn(md);
+				
 			}
 			
 		}
 
 		
 		return null;
+	}
+	
+	private void popMethodReturn(MethodDecl md) {
+		if (md.type instanceof BaseType) {
+			BaseType temp = (BaseType) md.type;
+			if (temp.typeKind != TypeKind.VOID) {
+				Machine.emit(Op.POP, 1);
+			}
+		}
 	}
 
 	@Override
