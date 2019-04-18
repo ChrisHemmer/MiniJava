@@ -244,4 +244,80 @@
 243         CALL         putintnl
 244         POP          0
 245         JUMP         L67
-246  L67:   RETURN (0)   1
+246  L67:   LOADL        0
+247         JUMPIF (0)   L68
+248         LOADL        1
+249         LOAD         3[LB]
+250         LOADL        0
+251         CALL         fieldref
+252         LOADL        0
+253         CALL         fieldref
+254         LOADL        5
+255         CALL         eq      
+256         CALL         and     
+257         JUMP         L69
+258  L68:   LOADL        0
+259         JUMP         L69
+260  L69:   LOADL        0
+261         JUMPIF (0)   L70
+262         LOADL        1
+263         LOAD         3[LB]
+264         LOADL        0
+265         CALL         fieldref
+266         LOADL        0
+267         CALL         fieldref
+268         LOADL        5
+269         CALL         eq      
+270         CALL         and     
+271         JUMP         L71
+272  L70:   LOADL        0
+273         JUMP         L71
+274  L71:   JUMPIF (1)   L72
+275         LOADL        0
+276         LOADL        1
+277         CALL         or      
+278         JUMP         L74
+279  L72:   LOADL        1
+280         JUMP         L74
+281  L73:   LOADL        1
+282         CALL         or      
+283  L74:   JUMPIF (1)   L75
+284         LOADL        0
+285         LOAD         3[LB]
+286         LOADL        0
+287         CALL         fieldref
+288         LOADL        0
+289         CALL         fieldref
+290         LOADL        10
+291         CALL         eq      
+292         CALL         or      
+293         JUMP         L77
+294  L75:   LOADL        1
+295         JUMP         L77
+296  L76:   LOAD         3[LB]
+297         LOADL        0
+298         CALL         fieldref
+299         LOADL        0
+300         CALL         fieldref
+301         LOADL        10
+302         CALL         eq      
+303         CALL         or      
+304  L77:   JUMPIF (0)   L78
+305         LOADL        1
+306         LOADL        1
+307         CALL         and     
+308         JUMP         L79
+309  L78:   LOADL        0
+310         JUMP         L79
+311  L79:   JUMPIF (1)   L80
+312         JUMP         L81
+313  L80:   LOADL        12
+314         CALL         putintnl
+315         POP          0
+316         JUMP         L82
+317  L81:   LOADL        1
+318         CALL         neg     
+319         CALL         putintnl
+320         POP          0
+321         JUMP         L82
+322  L82:   RETURN (0)   1

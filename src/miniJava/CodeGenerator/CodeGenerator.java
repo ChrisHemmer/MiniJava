@@ -293,6 +293,7 @@ public class CodeGenerator implements Visitor<Object, Object>{
 			}
 		}
 		Machine.emit(Op.POP, popSize.intValue());
+		varDeclOffset -= popSize.intValue();
 		//Machine.emit(Op.POP, popSize);
 		return null;
 	}
@@ -626,7 +627,7 @@ public class CodeGenerator implements Visitor<Object, Object>{
 				expr.argList.get(x).visit(this, null);
 			}
 			if (md.isStatic) {
-				Machine.emit(Op.CALL, expr.functionRef.decl.RED.offset);
+				Machine.emit(Op.CALL, Reg.CB, expr.functionRef.decl.RED.offset);
 			} else {
 				
 				
@@ -871,8 +872,7 @@ public class CodeGenerator implements Visitor<Object, Object>{
 		Declaration decl = ref.decl;
 		if (decl instanceof VarDecl || decl instanceof ParameterDecl) {
 			// LocalDecl (DONE)
-			if (ref instanceof IxRef) {
-				ref.visit(this, null);
+			if (ref instanceof IxRef) {ref.visit(this, null);
 				exp.visit(this, null);
 				Machine.emit(Prim.arrayupd);
 			} else {
@@ -889,7 +889,6 @@ public class CodeGenerator implements Visitor<Object, Object>{
 					exp.visit(this, null);
 					Machine.emit(Op.STORE, 0, Reg.SB, temp.id.decl.RED.offset);
 				} else if (temp.ref instanceof ThisRef) {
-					//System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++");
 					//ref.visit(this, null);
 					exp.visit(this, null);
 					Machine.emit(Op.STORE, 0, Reg.OB, temp.id.decl.RED.offset);

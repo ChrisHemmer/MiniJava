@@ -53,7 +53,7 @@ import miniJava.SyntacticAnalyzer.Scanner;
  */
 public class Compiler {
 
-	static boolean printCommands = true;
+	static boolean printCommands = false;
 	
 	public static void main(String[] args) {
 
