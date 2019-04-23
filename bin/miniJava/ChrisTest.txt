@@ -1,54 +1,14 @@
-class Counter {
+class Foo{
 
-	public static Counter globalCounter;
-
-	public static int totalCount;
-	
-	public int count;
-	
-	public void increase(int x){
-		if (x == 0){
-			System.out.println(count);
-		}
-		count = count + x;
-		totalCount = totalCount + x;
-
-		
-	}
-
-	
 	public static void main(String[] args){
-	
-		Counter a = new Counter();
-		a.increase(15);
+		int x = 5;
+		int y = 10;
 		
-		Counter b = new Counter();
-		b.increase(12);
-
-		System.out.println(Counter.totalCount);
-		Counter.totalCount = Counter.totalCount * 2 + 4;
-		System.out.println(Counter.totalCount);
+		int a = 0;
 		
-		
-		Counter.globalCounter = new Counter();
-		System.out.println(Counter.totalCount);
-		Counter.globalCounter.increase(12);
-		Counter.globalCounter.increase(0);
-		System.out.println(0);
-		System.out.println(Counter.globalCounter.count);
-		
+		a = (x+y) * x + (x+y);
+		System.out.println(a);
 	}
+
 
 }
-
-/*
-types of static references
-
-
-1. In a class, a simple IdRef to a static field of the class (as seen above)
-2. If class A has a static field x, A.x
-
-
-
-
-*/

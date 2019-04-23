@@ -53,7 +53,7 @@ import miniJava.SyntacticAnalyzer.Scanner;
  */
 public class Compiler {
 
-	static boolean printCommands = false;
+	static boolean printCommands = true;
 	
 	public static void main(String[] args) {
 
@@ -122,7 +122,7 @@ public class Compiler {
 		else {
 			System.out.println("Passed Type Checking");
 			System.out.println("Valid miniJava program");
-			//new ASTDisplay().showTree(ast);
+			new ASTDisplay().showTree(ast);
 		}
 		new CodeGenerator().encodeRun(ast);
 		new ObjectFile(fileName + ".mJAM").write();

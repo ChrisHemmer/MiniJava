@@ -329,7 +329,6 @@ public class CodeGenerator implements Visitor<Object, Object>{
 			ClassType aRefType = (ClassType) a.ref.decl.type;
 			ClassType bRefType = (ClassType) b.ref.decl.type;
 			
-			System.out.println(aRefType.className.spelling);
 			//System.out.println(bRefType.className.spelling);
 			if (aRefType.className.spelling.equals("_PrintStream") && a.id.spelling.equals("println") && b.id.spelling.equals("out") && c.id.spelling.equals("System")){
 				stmt.argList.get(0).visit(this, null);
@@ -374,7 +373,6 @@ public class CodeGenerator implements Visitor<Object, Object>{
 				
 				Machine.emit(Op.CALLI, Reg.CB, stmt.methodRef.decl.RED.offset);
 				popMethodReturn(md);
-				System.out.println(md.type);
 			}
 		} else {
 			for (int x = stmt.argList.size() - 1; x >= 0; x--) {
@@ -895,7 +893,8 @@ public class CodeGenerator implements Visitor<Object, Object>{
 		Declaration decl = ref.decl;
 		if (decl instanceof VarDecl || decl instanceof ParameterDecl) {
 			// LocalDecl (DONE)
-			if (ref instanceof IxRef) {ref.visit(this, null);
+			if (ref instanceof IxRef) {
+				ref.visit(this, null);
 				exp.visit(this, null);
 				Machine.emit(Prim.arrayupd);
 			} else {

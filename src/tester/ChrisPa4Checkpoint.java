@@ -63,7 +63,7 @@ public class ChrisPa4Checkpoint {
 		Arrays.sort(fileList);
 		
         for (File x : fileList) {
-        	if (x.getName().startsWith("fail") || x.getName().startsWith("TestIndex")) {
+        	if (x.getName().startsWith("TestIndex")) {
         		continue;
         	}
         	
@@ -72,7 +72,25 @@ public class ChrisPa4Checkpoint {
             if (x.getName().endsWith("out") || x.getName().startsWith(".") 
                 || x.getName().endsWith("mJAM") || x.getName().endsWith("asm"))
                    continue;
-            int returnCode = runTest(x); 
+            int returnCode = runTest(x);
+            
+            if (x.getName().startsWith("pass")) {
+            	if (returnCode == 0) {
+            		// correct
+            	} else {
+            		// incorrect
+            		System.err.println(x.getName() + " failed, expected return code of 0, got " + returnCode);
+            		failures += 1;
+            	}
+            } else if (x.getName().startsWith("fail")) {
+            	if (returnCode == 0) {
+            		// incorrect
+            		System.err.println(x.getName() + " failed, expected return code of 0, got " + returnCode);
+            		failures += 1;
+            	} else {
+            		// correct
+            	}
+            }
             
         }
         System.out.println("============================================");
@@ -89,34 +107,6 @@ public class ChrisPa4Checkpoint {
         pb.directory(classPath);
         pb.redirectErrorStream(true);
         Process p = pb.start();
-        
-        
-//        //List<String> cmds = new ArrayList<>();
-//        //cmds.add("javac Pa4Test.txt");
-//        String[] command = {"javac", x.getName()};
-//        ProcessBuilder temp = new ProcessBuilder(command);
-//        Process q = temp.start();
-//
-//        if (!q.waitFor(5, TimeUnit.SECONDS)) {
-//		// hung test
-//        	q.destroy();
-//        	return 130;  // interrupted
-//      	}
-//        
-//        if( q.getErrorStream().read() != -1 ){
-//        	print("Errors ", q.getErrorStream());
-//        }
-//        if (q.exitValue() == 0) {
-//        	q = new ProcessBuilder(new String[]{"java","-cp","d:\\","Pa4Test"}).start();
-//        }
-//        
-//        if (!q.waitFor(5, TimeUnit.SECONDS)) {
-//    		// hung test
-//            	q.destroy();
-//            	return 130;  // interrupted
-//        }
-//        System.out.println(q.exitValue());
-//        processStream(q.getInputStream());
         
         processOurStream(p.getInputStream());
         if (!p.waitFor(5, TimeUnit.SECONDS)) {
